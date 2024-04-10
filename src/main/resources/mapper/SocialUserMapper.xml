@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wong.reservation.mapper.SocialUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.wong.reservation.domain.entity.SocialUser">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="uuid" column="uuid" jdbcType="VARCHAR"/>
+        <result property="source" column="source" jdbcType="VARCHAR"/>
+        <result property="access_token" column="access_token" jdbcType="VARCHAR"/>
+        <result property="refresh_token" column="refresh_token" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,uuid,source,
+        access_token,refresh_token
+    </sql>
+</mapper>

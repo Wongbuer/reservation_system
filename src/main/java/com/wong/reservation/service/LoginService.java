@@ -4,6 +4,7 @@ import com.wong.reservation.domain.dto.LoginDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.User;
 import com.wong.reservation.domain.dto.SignUpDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import me.zhyd.oauth.request.AuthRequest;
 
 public interface LoginService {
@@ -21,7 +22,7 @@ public interface LoginService {
      * @param loginDTO 用户登录信息
      * @return 用户登录凭证
      */
-    Result<Object> userLogin(LoginDTO loginDTO);
+    Result<Object> userLogin(HttpServletRequest request, LoginDTO loginDTO);
 
     AuthRequest getAuthRequest(String source);
 }

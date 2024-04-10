@@ -7,6 +7,7 @@ import com.wong.reservation.domain.entity.User;
 import com.wong.reservation.service.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
@@ -43,8 +44,8 @@ public class LoginController {
      */
     @Operation(summary = "用户登录")
     @RequestMapping
-    public Result<Object> userLogin(@RequestBody LoginDTO loginDTO) {
-        return loginService.userLogin(loginDTO);
+    public Result<Object> userLogin(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+        return loginService.userLogin(request, loginDTO);
     }
 
     /**

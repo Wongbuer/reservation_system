@@ -8,9 +8,11 @@ import com.wong.reservation.domain.dto.LoginDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.dto.SignUpDTO;
 import com.wong.reservation.domain.entity.User;
+import com.wong.reservation.service.CaptchaService;
 import com.wong.reservation.service.LoginService;
 import com.wong.reservation.service.UserService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.request.AuthGithubRequest;
 import me.zhyd.oauth.request.AuthRequest;
@@ -35,6 +37,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Resource
     private UserService userService;
+    @Resource
+    private CaptchaService captchaService;
 
     @Override
     public Result<User> userSignUp(SignUpDTO signUpDTO) {
@@ -64,7 +68,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public Result<Object> userLogin(LoginDTO loginDTO) {
+    public Result<Object> userLogin(HttpServletRequest request, LoginDTO loginDTO) {
         // 判断参数是否正确
         if (!StringUtils.hasText(loginDTO.getAccount()) || !StringUtils.hasText(loginDTO.getPassword()) || !StringUtils.hasText(loginDTO.getCode())) {
             return Result.fail(400, "参数错误");
@@ -95,6 +99,10 @@ public class LoginServiceImpl implements LoginService {
             return Result.success("登录成功", user);
             // TODO: 写入Login日志
             // TODO: 跳转至对应的callback
+        }
+        // 判断图片验证码是否正确
+        if (!captchaService.verifyCaptcha(request, loginDTO.getCode())) {
+            return Result.fail(400, "验证码错误");
         }
         // 根据用户名获取用户
         user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, loginDTO.getAccount()));

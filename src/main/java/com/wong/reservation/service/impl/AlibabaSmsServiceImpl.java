@@ -5,6 +5,7 @@ import com.aliyun.auth.credentials.Credential;
 import com.aliyun.auth.credentials.provider.StaticCredentialProvider;
 import com.aliyun.sdk.service.dysmsapi20170525.AsyncClient;
 import com.aliyun.sdk.service.dysmsapi20170525.models.SendSmsRequest;
+import com.wong.reservation.domain.dto.CaptchaDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.service.CaptchaService;
 import com.wong.reservation.service.SmsService;
@@ -50,14 +51,14 @@ public class AlibabaSmsServiceImpl implements SmsService {
 
     @SneakyThrows
     @Override
-    public Result<String> sendMessage(String phone, String verifyCode) {
+    public Result<String> sendMessage(String phone, CaptchaDTO captchaDTO) {
         // 判断手机号是否正确
         if (!PhoneUtil.isMobile(phone)) {
             return Result.fail(400, "手机号格式错误");
         }
         // 判断图片验证码是否正确
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        if (!captchaService.verifyCaptcha(request, verifyCode)) {
+        if (!captchaService.verifyCaptcha(request, captchaDTO)) {
             return Result.fail(400, "图片验证码错误");
         }
         // 随机生成四位数字验证码

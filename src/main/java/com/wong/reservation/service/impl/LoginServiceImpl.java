@@ -75,7 +75,7 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public Result<Object> userLogin(HttpServletRequest request, LoginDTO loginDTO) {
         // 判断参数是否正确
-        if (!StringUtils.hasText(loginDTO.getAccount()) || !StringUtils.hasText(loginDTO.getPassword()) || !StringUtils.hasText(loginDTO.getCode())) {
+        if (!StringUtils.hasText(loginDTO.getAccount()) || !StringUtils.hasText(loginDTO.getPassword()) || ObjectUtils.isEmpty(loginDTO.getCaptchaDTO())) {
             return Result.fail(400, "参数错误");
         }
         // 是否为验证码登录
@@ -88,11 +88,12 @@ public class LoginServiceImpl implements LoginService {
             // 判断该用户是否存在
             user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getPhone, loginDTO.getAccount()));
             if (ObjectUtils.isEmpty(user)) {
+                // TODO: 未注册用户验证码登录自动创建用户
                 return Result.fail(400, "用户未注册");
             }
             // 判断手机验证码是否正确
             String code = (String) redisUtils.get(SMS_LOGIN_PREFIX + loginDTO.getAccount());
-            if (!code.equals(loginDTO.getCode())) {
+            if (!code.equals(loginDTO.getCaptchaDTO().getCode())) {
                 return Result.fail(400, "手机验证码错误");
             }
             // 判断是否已登录
@@ -114,7 +115,7 @@ public class LoginServiceImpl implements LoginService {
             // TODO: 跳转至对应的callback
         }
         // 判断图片验证码是否正确
-        if (!captchaService.verifyCaptcha(request, loginDTO.getCode())) {
+        if (!captchaService.verifyCaptcha(request, loginDTO.getCaptchaDTO())) {
             return Result.fail(400, "验证码错误");
         }
         // 根据用户名获取用户

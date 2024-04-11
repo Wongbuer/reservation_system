@@ -17,7 +17,7 @@ spring:
     servlet:
       load-on-startup: 1
 sa-token:
-  token-name: token
+  token-name: reservation:token
 knife4j:
   enable: true
   setting:

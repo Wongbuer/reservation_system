@@ -1,5 +1,6 @@
 package com.wong.reservation.controller;
 
+import com.wong.reservation.domain.dto.CaptchaDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.service.SmsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,8 +25,8 @@ public class SmsController {
      */
     @Operation(summary = "发送短信")
     @RequestMapping(value = "/sendSms", method = RequestMethod.POST)
-    public Result<String> sendSmsMessage(String phone, String verifyCode) {
-        return smsService.sendMessage(phone, verifyCode);
+    public Result<String> sendSmsMessage(String phone, CaptchaDTO captchaDTO) {
+        return smsService.sendMessage(phone, captchaDTO);
     }
 
 }

@@ -6,6 +6,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.io.IOException;
  * @createDate 2024/4/11
  */
 @RestController
-@RequestMapping("/captcha")
+@RequestMapping(value = "/captcha", method = {RequestMethod.GET, RequestMethod.POST})
 public class CaptchaController {
     @Resource
     private CaptchaService captchaService;

@@ -11,6 +11,7 @@ import com.wong.reservation.domain.entity.User;
 import com.wong.reservation.service.CaptchaService;
 import com.wong.reservation.service.LoginService;
 import com.wong.reservation.service.UserService;
+import com.wong.reservation.utils.RedisUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import me.zhyd.oauth.config.AuthConfig;
@@ -22,6 +23,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.wong.reservation.constant.RedisConstant.SMS_LOGIN_PREFIX;
 
 /**
  * @author Wongbuer
@@ -39,6 +42,8 @@ public class LoginServiceImpl implements LoginService {
     private UserService userService;
     @Resource
     private CaptchaService captchaService;
+    @Resource
+    private RedisUtils redisUtils;
 
     @Override
     public Result<User> userSignUp(SignUpDTO signUpDTO) {
@@ -85,15 +90,23 @@ public class LoginServiceImpl implements LoginService {
             if (ObjectUtils.isEmpty(user)) {
                 return Result.fail(400, "用户未注册");
             }
-            // TODO: 判断手机验证码是否正确
+            // 判断手机验证码是否正确
+            String code = (String) redisUtils.get(SMS_LOGIN_PREFIX + loginDTO.getAccount());
+            if (!code.equals(loginDTO.getCode())) {
+                return Result.fail(400, "手机验证码错误");
+            }
             // 判断是否已登录
             if (StpUtil.isLogin()) {
+                // 清除短信验证码
+                redisUtils.del(SMS_LOGIN_PREFIX + loginDTO.getAccount());
                 // 去除密码字段, 避免序列化
                 user.setPassword(null);
                 return Result.success("已登录", user);
             }
             // 用户登录
             StpUtil.login(user.getId());
+            // 清除短信验证码
+            redisUtils.del(SMS_LOGIN_PREFIX + loginDTO.getAccount());
             // 去除密码字段, 避免序列化
             user.setPassword(null);
             return Result.success("登录成功", user);

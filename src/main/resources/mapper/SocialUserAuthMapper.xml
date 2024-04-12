@@ -5,12 +5,15 @@
 <mapper namespace="com.wong.reservation.mapper.SocialUserAuthMapper">
 
     <resultMap id="BaseResultMap" type="com.wong.reservation.domain.entity.SocialUserAuth">
-        <id property="id" column="id" jdbcType="BIGINT"/>
-        <result property="user_id" column="user_id" jdbcType="BIGINT"/>
-        <result property="social_user_id" column="social_user_id" jdbcType="BIGINT"/>
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="socialUserId" column="social_user_id" jdbcType="BIGINT"/>
+            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="updateAt" column="update_at" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,user_id,social_user_id
+        id,user_id,social_user_id,
+        created_at,update_at
     </sql>
 </mapper>

@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author Wongbuer
@@ -28,10 +29,20 @@ public class SocialUserAuth implements Serializable {
      * 系统用户id
      */
     @TableField(value = "user_id")
-    private Long user_id;
+    private Long userId;
     /**
      * 社会化用户id
      */
     @TableField(value = "social_user_id")
-    private Long social_user_id;
+    private Long socialUserId;
+    /**
+     * 创建时间
+     */
+    @TableField(value = "created_at")
+    private LocalDateTime createdAt;
+    /**
+     * 更新时间
+     */
+    @TableField(value = "update_at")
+    private LocalDateTime updateAt;
 }

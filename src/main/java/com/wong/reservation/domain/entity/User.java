@@ -1,5 +1,6 @@
 package com.wong.reservation.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -8,6 +9,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @TableName user
@@ -22,7 +24,7 @@ public class User implements Serializable {
     /**
      * 主键
      */
-    @TableId(value = "id")
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     /**
      * 用户名
@@ -59,4 +61,19 @@ public class User implements Serializable {
      */
     @TableField(value = "phone")
     private String phone;
+    /**
+     * 默认地址id
+     */
+    @TableField(value = "default_address_id")
+    private Long defaultAddressId;
+    /**
+     * 创建时间
+     */
+    @TableField(value = "created_at")
+    private LocalDateTime createdAt;
+    /**
+     * 更新时间
+     */
+    @TableField(value = "updated_at")
+    private LocalDateTime updatedAt;
 }

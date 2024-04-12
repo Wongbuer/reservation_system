@@ -14,5 +14,6 @@ import java.util.Map;
  */
 public interface CaptchaService {
     Result<Map<String, Object>> generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException;
+
     boolean verifyCaptcha(HttpServletRequest request, CaptchaDTO code);
 }

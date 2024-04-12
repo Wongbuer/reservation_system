@@ -62,7 +62,7 @@ public class LoginController {
     /**
      * 第三方登录
      *
-     * @param source 第三方登录源
+     * @param source   第三方登录源
      * @param response http相应
      * @throws IOException IO异常
      */

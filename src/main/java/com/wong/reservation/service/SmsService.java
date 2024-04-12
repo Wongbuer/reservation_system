@@ -11,7 +11,7 @@ public interface SmsService {
     /**
      * 发送短信验证码
      *
-     * @param phone 手机号
+     * @param phone      手机号
      * @param captchaDTO 验证码包装类
      * @return 发送结果
      */

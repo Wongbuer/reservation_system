@@ -2,8 +2,8 @@ package com.wong.reservation.service;
 
 import com.wong.reservation.domain.dto.LoginDTO;
 import com.wong.reservation.domain.dto.Result;
-import com.wong.reservation.domain.entity.User;
 import com.wong.reservation.domain.dto.SignUpDTO;
+import com.wong.reservation.domain.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import me.zhyd.oauth.request.AuthRequest;
 

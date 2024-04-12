@@ -17,12 +17,6 @@ import java.time.LocalDateTime;
 @TableName(value = "social_user")
 @Data
 public class SocialUser implements Serializable {
-    public SocialUser(String uuid, String source, String accessToken) {
-        this.uuid = uuid;
-        this.source = source;
-        this.accessToken = accessToken;
-    }
-
     @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -61,4 +55,9 @@ public class SocialUser implements Serializable {
      */
     @TableField(value = "updated_at")
     private LocalDateTime updatedAt;
+    public SocialUser(String uuid, String source, String accessToken) {
+        this.uuid = uuid;
+        this.source = source;
+        this.accessToken = accessToken;
+    }
 }

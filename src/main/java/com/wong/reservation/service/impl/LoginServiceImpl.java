@@ -1,6 +1,7 @@
 package com.wong.reservation.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
+import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.PhoneUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.request.AuthGithubRequest;
 import me.zhyd.oauth.request.AuthRequest;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -151,9 +153,11 @@ public class LoginServiceImpl implements LoginService {
 
         // 判断用户是否已经登录
         if (StpUtil.isLogin(user.getId())) {
+            // 再次登录
+            StpUtil.login(user.getId());
             // 去除密码字段, 避免序列化
             user.setPassword(null);
-            return Result.success("已登录", user);
+            return Result.success("登录成功", user);
         }
         // 用户登录
         StpUtil.login(user.getId());

@@ -23,4 +23,14 @@
         full_address,postal_code,created_at,
         updated_at
     </sql>
+
+    <select id="selectAddressListByUserId" resultMap="BaseResultMap">
+        select a.id,name,phone,
+               province,city,district,
+               full_address,postal_code,created_at,
+               updated_at
+        from reservation_system.user_address
+        join reservation_system.address a on a.id = user_address.address_id
+        where user_id = #{userId}
+    </select>
 </mapper>

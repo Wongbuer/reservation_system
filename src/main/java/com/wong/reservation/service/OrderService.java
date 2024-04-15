@@ -8,17 +8,17 @@ import com.wong.reservation.domain.entity.Order;
 import java.util.List;
 
 /**
-* @author Wongbuer
-* @description 针对表【order】的数据库操作Service
-* @createDate 2024-04-15 18:05:22
-*/
+ * @author Wongbuer
+ * @description 针对表【order】的数据库操作Service
+ * @createDate 2024-04-15 18:05:22
+ */
 public interface OrderService extends IService<Order> {
     /**
      * 获取订单(默认以创建时间降序排序)
      *
      * @param status 订单状态
-     * @param sort 是否排序
-     * @return Result<List<Order>>
+     * @param sort   是否排序
+     * @return Result<List < Order>>
      */
     Result<List<Order>> getOrderByUserId(String status, Boolean sort);
 

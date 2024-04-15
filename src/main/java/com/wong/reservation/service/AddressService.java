@@ -17,7 +17,7 @@ public interface AddressService extends IService<Address> {
     /**
      * 根据用户ID获取所有地址信息
      *
-     * @return Result<List<Address>> 地址信息列表
+     * @return Result<List < Address>> 地址信息列表
      */
     Result<List<Address>> getAllAddressWithLoginUserId();
 

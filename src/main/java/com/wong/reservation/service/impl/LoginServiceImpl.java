@@ -47,6 +47,16 @@ public class LoginServiceImpl implements LoginService {
     @Resource
     private RedisUtils redisUtils;
 
+    private static @NotNull Map<String, Object> packagingResult(User user) {
+        Map<String, Object> result = new HashMap<>(2);
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+        result.put("tokenInfo", tokenInfo.getTokenValue());
+        result.put("user", user);
+        // 去除密码字段, 避免序列化
+        user.setPassword(null);
+        return result;
+    }
+
     @Override
     public Result<User> userSignUp(SignUpDTO signUpDTO) {
         // 判断所含参数为空
@@ -163,16 +173,6 @@ public class LoginServiceImpl implements LoginService {
         Map<String, Object> result = packagingResult(user);
         return Result.success("登录成功", result);
         // TODO: 跳转至对应的callback
-    }
-
-    private static @NotNull Map<String, Object> packagingResult(User user) {
-        Map<String, Object> result = new HashMap<>(2);
-        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
-        result.put("tokenInfo", tokenInfo.getTokenValue());
-        result.put("user", user);
-        // 去除密码字段, 避免序列化
-        user.setPassword(null);
-        return result;
     }
 
     @Override

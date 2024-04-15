@@ -26,8 +26,8 @@ public class OrderController {
      * 获取订单信息(默认以订单创建时间降序)
      *
      * @param status 订单状态
-     * @param sort 是否排序
-     * @return Result<List<Order>> 订单列表
+     * @param sort   是否排序
+     * @return Result<List < Order>> 订单列表
      */
     @Operation(summary = "获取订单信息(默认以订单创建时间降序)")
     @RequestMapping

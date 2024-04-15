@@ -26,9 +26,9 @@ public class CaptchaController {
     /**
      * 生成验证码
      *
-     * @param request HttpServletRequest
+     * @param request  HttpServletRequest
      * @param response HttpServletResponse
-     * @return Result<Map<String, Object>> 图片验证码和其UUID
+     * @return Result<Map < String, Object>> 图片验证码和其UUID
      * @throws IOException IO异常
      */
     @RequestMapping("/generate")
@@ -39,7 +39,7 @@ public class CaptchaController {
     /**
      * 验证验证码
      *
-     * @param request HttpServletRequest
+     * @param request    HttpServletRequest
      * @param captchaDTO 验证码
      * @return boolean 验证结果
      */

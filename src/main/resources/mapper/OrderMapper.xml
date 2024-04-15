@@ -8,6 +8,8 @@
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="userId" column="user_id" jdbcType="BIGINT"/>
             <result property="employeeId" column="employee_id" jdbcType="BIGINT"/>
+            <result property="serviceId" column="service_id" jdbcType="BIGINT"/>
+            <result property="reservationTime" column="reservation_time" jdbcType="TIMESTAMP"/>
             <result property="closeTime" column="close_time" jdbcType="TIMESTAMP"/>
             <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
             <result property="paymentTime" column="payment_time" jdbcType="TIMESTAMP"/>
@@ -18,6 +20,7 @@
             <result property="serviceCharge" column="service_charge" jdbcType="DECIMAL"/>
             <result property="status" column="status" jdbcType="INTEGER"/>
             <result property="rate" column="rate" jdbcType="INTEGER"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
             <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
             <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
     </resultMap>

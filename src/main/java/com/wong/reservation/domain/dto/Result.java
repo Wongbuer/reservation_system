@@ -19,7 +19,7 @@ public class Result<T> {
 
 
     public Result(T data) {
-        this.code = 200;
+        this.code = 20000;
         this.msg = DEFAULT_SUCCESS_MSG;
         this.data = data;
     }
@@ -35,7 +35,7 @@ public class Result<T> {
     }
 
     public static <T> Result<T> fail(String msg) {
-        return new Result<>(200, msg);
+        return new Result<>(20001, msg);
     }
 
     public static <T> Result<T> fail(Integer code, String msg) {
@@ -43,19 +43,19 @@ public class Result<T> {
     }
 
     public static <T> Result<T> success(String msg) {
-        return new Result<>(200, msg);
+        return new Result<>(20000, msg);
     }
 
     public static <T> Result<T> success(T data) {
-        return new Result<>(200, data);
+        return new Result<>(20000, data);
     }
 
     public static <T> Result<T> success(String msg, T data) {
-        return new Result<>(200, msg, data);
+        return new Result<>(20000, msg, data);
     }
 
     public static Result<?> token() {
-        return new Result<>(401, "未能读取到有效token, 请登录");
+        return new Result<>(40001, "未能读取到有效token, 请登录");
     }
 
 }

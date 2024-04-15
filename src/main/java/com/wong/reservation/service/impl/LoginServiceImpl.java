@@ -110,9 +110,8 @@ public class LoginServiceImpl implements LoginService {
             StpUtil.login(user.getId());
             // 清除短信验证码
             redisUtils.del(SMS_LOGIN_PREFIX + loginDTO.getAccount());
-            // 去除密码字段, 避免序列化
-            user.setPassword(null);
-            return Result.success("登录成功", user);
+            Map<String, Object> result = packagingResult(user);
+            return Result.success("登录成功", result);
             // TODO: 写入Login日志
             // TODO: 跳转至对应的callback
         }
@@ -155,17 +154,25 @@ public class LoginServiceImpl implements LoginService {
         if (StpUtil.isLogin(user.getId())) {
             // 再次登录
             StpUtil.login(user.getId());
-            // 去除密码字段, 避免序列化
-            user.setPassword(null);
-            return Result.success("登录成功", user);
+            Map<String, Object> result = packagingResult(user);
+            return Result.success("登录成功", result);
         }
         // 用户登录
         StpUtil.login(user.getId());
         // TODO: 写入Login日志
+        Map<String, Object> result = packagingResult(user);
+        return Result.success("登录成功", result);
+        // TODO: 跳转至对应的callback
+    }
+
+    private static @NotNull Map<String, Object> packagingResult(User user) {
+        Map<String, Object> result = new HashMap<>(2);
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+        result.put("tokenInfo", tokenInfo.getTokenValue());
+        result.put("user", user);
         // 去除密码字段, 避免序列化
         user.setPassword(null);
-        return Result.success("登录成功", user);
-        // TODO: 跳转至对应的callback
+        return result;
     }
 
     @Override
@@ -184,4 +191,6 @@ public class LoginServiceImpl implements LoginService {
             default -> throw new IllegalStateException("Unexpected value: " + source);
         };
     }
+
+
 }

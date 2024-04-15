@@ -20,7 +20,7 @@ sa-token:
   token-name: reservation
   is-concurrent: true
   is-share: false
-  is-write-header: true
+  is-write-header: false
   timeout: 604800
   max-login-count: 2
   is-print: false
@@ -33,3 +33,5 @@ knife4j:
 mybatis-plus:
   global-config:
     banner: false
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

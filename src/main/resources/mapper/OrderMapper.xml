@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wong.reservation.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.wong.reservation.domain.entity.Order">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="employeeId" column="employee_id" jdbcType="BIGINT"/>
+            <result property="closeTime" column="close_time" jdbcType="TIMESTAMP"/>
+            <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+            <result property="paymentTime" column="payment_time" jdbcType="TIMESTAMP"/>
+            <result property="acceptedTime" column="accepted_time" jdbcType="TIMESTAMP"/>
+            <result property="addressId" column="address_id" jdbcType="BIGINT"/>
+            <result property="payment" column="payment" jdbcType="DECIMAL"/>
+            <result property="paymentType" column="payment_type" jdbcType="INTEGER"/>
+            <result property="serviceCharge" column="service_charge" jdbcType="DECIMAL"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="rate" column="rate" jdbcType="INTEGER"/>
+            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,employee_id,
+        close_time,end_time,payment_time,
+        accepted_time,address_id,payment,
+        payment_type,service_charge,status,
+        rate,created_at,updated_at
+    </sql>
+</mapper>

@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
+ * @author Wongbuer
  * @TableName user
  */
 @TableName(value = "user")

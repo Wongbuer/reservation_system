@@ -59,20 +59,20 @@ public class CaptchaServiceImpl implements CaptchaService {
         Map<String, Object> result = new HashMap<>();
         result.put("key", key);
         result.put("image", specCaptcha.toBase64());
-        String redisKey = CAPTCHA_PREFIX + key;
-        redisUtils.set(redisKey, verCode, 60 * 30);
+        // 修改redis中验证码储存方式为hash
+        redisUtils.hset(CAPTCHA_PREFIX, key, verCode, 60 * 30);
         return Result.success(result);
     }
 
     private boolean verifyCaptchaWithRedis(HttpServletRequest request, CaptchaDTO captchaDTO) {
-        String redisKey = CAPTCHA_PREFIX + captchaDTO.getUuid();
-        String redisCode = (String) redisUtils.get(redisKey);
+        String redisCode = (String) redisUtils.hget(CAPTCHA_PREFIX, captchaDTO.getUuid());
         if (redisCode == null) {
             return false;
         }
         boolean result = redisCode.equals(captchaDTO.getCode());
         if (result) {
-            redisUtils.del(redisKey);
+            // 修改redis中验证码储存方式为hash
+            redisUtils.hdel(CAPTCHA_PREFIX, captchaDTO.getUuid());
         }
         return result;
     }

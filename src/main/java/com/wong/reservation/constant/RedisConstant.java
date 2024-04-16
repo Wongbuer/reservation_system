@@ -6,5 +6,5 @@ package com.wong.reservation.constant;
  */
 public class RedisConstant {
     public static final String SMS_LOGIN_PREFIX = "reservation:sms:login:";
-    public static final String CAPTCHA_PREFIX = "reservation:captcha:";
+    public static final String CAPTCHA_PREFIX = "reservation:captcha";
 }

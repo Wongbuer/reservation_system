@@ -57,13 +57,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             return Result.fail(validCode, "订单信息不完整");
         }
         if ((validCode & 4) == 4) {
-            return Result.fail(validCode, "订单服务有误");
+            return Result.fail(40000 + validCode, "订单服务有误");
         }
         if ((validCode & 2) == 2) {
-            return Result.fail(validCode, "订单地址有误");
+            return Result.fail(40000 + validCode, "订单地址有误");
         }
         if ((validCode & 1) == 1) {
-            return Result.fail(validCode, "订单预约时间有误");
+            return Result.fail(40000 + validCode, "订单预约时间有误");
         }
 
         // 判断是否含有相同的订单(相同指地址/服务/预约时间均相同)
@@ -155,13 +155,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         Map<String, Long> map = baseMapper.isOrderInfoValid(order);
         int res = 0;
-        if (map.get("employee_service_exists") != 0) {
+        if (map.get("employee_service_exists") == 0) {
             res += 4;
         }
-        if (map.get("address_exists") != 0) {
+        if (map.get("address_exists") == 0) {
             res += 2;
         }
-        if (map.get("future_check") != 0) {
+        if (map.get("future_check") == 0) {
             res += 1;
         }
         return res;

@@ -5,24 +5,24 @@
 <mapper namespace="com.wong.reservation.mapper.OrderMapper">
 
     <resultMap id="BaseResultMap" type="com.wong.reservation.domain.entity.Order">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="userId" column="user_id" jdbcType="BIGINT"/>
-            <result property="employeeId" column="employee_id" jdbcType="BIGINT"/>
-            <result property="serviceId" column="service_id" jdbcType="BIGINT"/>
-            <result property="reservationTime" column="reservation_time" jdbcType="TIMESTAMP"/>
-            <result property="closeTime" column="close_time" jdbcType="TIMESTAMP"/>
-            <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
-            <result property="paymentTime" column="payment_time" jdbcType="TIMESTAMP"/>
-            <result property="acceptedTime" column="accepted_time" jdbcType="TIMESTAMP"/>
-            <result property="addressId" column="address_id" jdbcType="BIGINT"/>
-            <result property="payment" column="payment" jdbcType="DECIMAL"/>
-            <result property="paymentType" column="payment_type" jdbcType="INTEGER"/>
-            <result property="serviceCharge" column="service_charge" jdbcType="DECIMAL"/>
-            <result property="status" column="status" jdbcType="INTEGER"/>
-            <result property="rate" column="rate" jdbcType="INTEGER"/>
-            <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
-            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
-            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+        <result property="employeeId" column="employee_id" jdbcType="BIGINT"/>
+        <result property="serviceId" column="service_id" jdbcType="BIGINT"/>
+        <result property="reservationTime" column="reservation_time" jdbcType="TIMESTAMP"/>
+        <result property="closeTime" column="close_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="paymentTime" column="payment_time" jdbcType="TIMESTAMP"/>
+        <result property="acceptedTime" column="accepted_time" jdbcType="TIMESTAMP"/>
+        <result property="addressId" column="address_id" jdbcType="BIGINT"/>
+        <result property="payment" column="payment" jdbcType="DECIMAL"/>
+        <result property="paymentType" column="payment_type" jdbcType="INTEGER"/>
+        <result property="serviceCharge" column="service_charge" jdbcType="DECIMAL"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="rate" column="rate" jdbcType="INTEGER"/>
+        <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -34,14 +34,14 @@
     </sql>
     <select id="isOrderInfoValid" resultType="map">
         SELECT EXISTS(SELECT *
-                                FROM reservation_system.service s
-                                         JOIN reservation_system.employee_service es ON s.id = es.service_id
-                                         JOIN reservation_system.employee e on es.employee_id = e.id
-                                WHERE e.id = #{employeeId})        AS employee_service_exists,
+                      FROM reservation_system.service s
+                               JOIN reservation_system.employee_service es ON s.id = es.service_id
+                               JOIN reservation_system.employee e on es.employee_id = e.id
+                      WHERE e.id = #{employeeId})  AS employee_service_exists,
                EXISTS(SELECT 1
                       FROM reservation_system.address a
                       WHERE a.id = #{addressId}
-                        AND a.user_id = #{userId})   AS address_exists,
-               NOW() > #{reservationTime} AS future_check
+                        AND a.user_id = #{userId}) AS address_exists,
+               #{reservationTime} > NOW()          AS future_check
     </select>
 </mapper>

@@ -3,6 +3,7 @@ package com.wong.reservation.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Order;
@@ -47,11 +48,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     public Result<?> addOrder(Order order) {
         // 从登录信息获取userId
-        Long userId = StpUtil.getLoginId(-1L);
-        if (userId == -1L) {
-            // 用户未登录
-            return Result.token();
-        }
+        Long userId = StpUtil.getLoginIdAsLong();
         order.setUserId(userId);
 
         // 判断order是否含有必要参数(地址ID是否存在/服务ID是否存在/用户ID是否存在/员工ID是否存在/时间是否合法)
@@ -115,13 +112,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     public Result<?> deleteOrder(Long id) {
         // 根据登录信息获取userId
-        Long userId = StpUtil.getLoginId(-1L);
-        if (userId == -1L) {
-            // 用户未登录
-            return Result.token();
-        }
+        long userId = StpUtil.getLoginIdAsLong();
         // 删除订单
-        boolean isDeleted = removeById(id);
+        LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
+        wrapper
+                .eq(Order::getUserId, userId)
+                .eq(Order::getId, id);
+        boolean isDeleted = remove(wrapper);
         return isDeleted ? Result.success("删除订单成功") : Result.fail("删除订单失败");
     }
 

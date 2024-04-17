@@ -13,7 +13,7 @@ import java.util.List;
  * @Entity com.wong.reservation.domain.entity.Address
  */
 public interface AddressMapper extends BaseMapper<Address> {
-    List<Address> selectAddressListByUserId(String userId);
+    List<Address> selectAddressListByUserId(Long userId);
 }
 
 

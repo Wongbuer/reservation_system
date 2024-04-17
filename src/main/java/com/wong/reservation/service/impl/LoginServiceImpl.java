@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wong.reservation.constant.RedisConstant.SMS_LOGIN_PREFIX;
+import static com.wong.reservation.constant.SystemConstant.SMS_LOGIN_PREFIX;
 
 /**
  * @author Wongbuer

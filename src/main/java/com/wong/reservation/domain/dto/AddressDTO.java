@@ -10,7 +10,9 @@ import lombok.Data;
 @Data
 public class AddressDTO {
     @Schema(title = "收货人ID", name = "id", example = "1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private String id;
+    private Long id;
+    @Schema(title = "用户ID", name = "userId", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Long userId;
     @Schema(title = "收货人姓名", name = "name", example = "张三", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
     @Schema(title = "收货人电话", name = "phone", example = "12345678901", requiredMode = Schema.RequiredMode.REQUIRED)

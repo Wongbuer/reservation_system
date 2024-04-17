@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.wong.reservation.constant.RedisConstant.CAPTCHA_PREFIX;
+import static com.wong.reservation.constant.SystemConstant.CAPTCHA_PREFIX;
 
 /**
  * @author Wongbuer

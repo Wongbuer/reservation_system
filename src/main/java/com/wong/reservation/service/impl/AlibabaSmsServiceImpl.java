@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static com.wong.reservation.constant.RedisConstant.SMS_LOGIN_PREFIX;
+import static com.wong.reservation.constant.SystemConstant.SMS_LOGIN_PREFIX;
 
 /**
  * @author Wongbuer

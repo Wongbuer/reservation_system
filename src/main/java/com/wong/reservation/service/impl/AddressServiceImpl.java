@@ -26,11 +26,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
     @Override
     public Result<List<Address>> getAllAddressWithLoginUserId() {
         // 根据当前登录用户获取用户ID
-        String loginId = (String) StpUtil.getLoginId();
-        // 判断用户ID是否为空
-        if (!StringUtils.hasText(loginId)) {
-            return Result.fail(400, "用户未登录");
-        }
+        Long loginId = StpUtil.getLoginIdAsLong();
         // 根据用户ID查询地址信息
         List<Address> addresses = baseMapper.selectAddressListByUserId(loginId);
         return Result.success("获取地址信息成功", addresses);
@@ -44,6 +40,7 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
             Assert.isTrue(isSaved, "添加地址失败");
             return Result.success("添加地址成功");
         } catch (Exception e) {
+            e.printStackTrace();
             return Result.fail("添加地址失败");
         }
     }

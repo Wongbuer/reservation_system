@@ -2,6 +2,9 @@ package com.wong.reservation.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wong.reservation.domain.entity.Order;
+import org.apache.ibatis.annotations.MapKey;
+
+import java.util.Map;
 
 /**
  * @author Wongbuer
@@ -10,7 +13,7 @@ import com.wong.reservation.domain.entity.Order;
  * @Entity com.wong.reservation.domain.entity.Order
  */
 public interface OrderMapper extends BaseMapper<Order> {
-
+    Map<String, Long> isOrderInfoValid(Order order);
 }
 
 

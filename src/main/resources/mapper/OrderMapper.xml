@@ -32,4 +32,16 @@
         payment_type,service_charge,status,
         rate,created_at,updated_at
     </sql>
+    <select id="isOrderInfoValid" resultType="map">
+        SELECT EXISTS(SELECT *
+                                FROM reservation_system.service s
+                                         JOIN reservation_system.employee_service es ON s.id = es.service_id
+                                         JOIN reservation_system.employee e on es.employee_id = e.id
+                                WHERE e.id = #{employeeId})        AS employee_service_exists,
+               EXISTS(SELECT 1
+                      FROM reservation_system.address a
+                      WHERE a.id = #{addressId}
+                        AND a.user_id = #{userId})   AS address_exists,
+               NOW() > #{reservationTime} AS future_check
+    </select>
 </mapper>

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Wongbuer
@@ -29,6 +30,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 查询当前用户对应status下的所有订单, 如果status为null则为所有status的订单
         wrapper.eq(Order::getUserId, userId)
                 .eq(status != null, Order::getStatus, status)
+                // 未被删除的订单
+                .eq(Order::getIsDeleted, 0)
                 .orderByDesc(sort, Order::getCreatedAt);
         List<Order> orderList = null;
         try {
@@ -50,7 +53,22 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             return Result.token();
         }
         order.setUserId(userId);
-        // TODO: 判断order是否含有必要参数(地址ID是否存在/服务ID是否存在/用户ID是否存在/员工ID是否存在/时间是否合法)
+
+        // 判断order是否含有必要参数(地址ID是否存在/服务ID是否存在/用户ID是否存在/员工ID是否存在/时间是否合法)
+        int validCode = isOrderInfoValid(order);
+        if (validCode == -1) {
+            return Result.fail(validCode, "订单信息不完整");
+        }
+        if ((validCode & 4) == 4) {
+            return Result.fail(validCode, "订单服务有误");
+        }
+        if ((validCode & 2) == 2) {
+            return Result.fail(validCode, "订单地址有误");
+        }
+        if ((validCode & 1) == 1) {
+            return Result.fail(validCode, "订单预约时间有误");
+        }
+
         // 判断是否含有相同的订单(相同指地址/服务/预约时间均相同)
         if (checkDuplicateOrder(order)) {
             return Result.fail("订单重复, 请勿重复下单");
@@ -132,6 +150,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 field.set(newOrder, field.get(oldOrder));
             }
         }
+    }
+
+    private int isOrderInfoValid(Order order) {
+        if (order.getAddressId() == null || order.getServiceId() == null || order.getUserId() == null || order.getEmployeeId() == null || order.getReservationTime() == null) {
+            return -1;
+        }
+        Map<String, Long> map = baseMapper.isOrderInfoValid(order);
+        int res = 0;
+        if (map.get("employee_service_exists") != 0) {
+            res += 4;
+        }
+        if (map.get("address_exists") != 0) {
+            res += 2;
+        }
+        if (map.get("future_check") != 0) {
+            res += 1;
+        }
+        return res;
     }
 }
 

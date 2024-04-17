@@ -27,6 +27,11 @@ public class Address implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     /**
+     * 用户id
+     */
+    @TableField(value = "user_id")
+    private Long userId;
+    /**
      * "收货人"名称
      */
     @TableField(value = "name")

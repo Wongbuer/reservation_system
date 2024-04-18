@@ -25,4 +25,11 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return Result.token();
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public Result<?> exceptionHandler(Exception e) {
+        e.printStackTrace();
+        return Result.fail(50000, "系统异常");
+    }
 }

@@ -23,6 +23,14 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
         employeeService.setServiceId(employeeServiceDTO.getServiceId());
         employeeService.setPrice(employeeServiceDTO.getPrice());
         employeeService.setTimeUint(employeeServiceDTO.getTimeUint());
+
+        // 查询有无重复数据
+        LambdaQueryWrapper<EmployeeService> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EmployeeService::getEmployeeId, employeeServiceDTO.getEmployeeId())
+                .eq(EmployeeService::getServiceId, employeeServiceDTO.getServiceId());
+        if (count(wrapper) > 0) {
+            return false;
+        }
         boolean isSaved;
         try {
             isSaved = save(employeeService);

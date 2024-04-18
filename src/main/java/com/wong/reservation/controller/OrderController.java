@@ -42,10 +42,11 @@ public class OrderController {
      * @return Result<?> 添加结果
      */
     @Operation(summary = "添加订单")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result<?> addOrder(@RequestBody Order order) {
-        return orderService.addOrder(order);
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    public Result<?> createOrder(@RequestBody Order order) {
+        return orderService.createOrder(order);
     }
+
 
     /**
      * 修改订单
@@ -70,4 +71,6 @@ public class OrderController {
     public Result<?> deleteOrder(Long id) {
         return orderService.deleteOrder(id);
     }
+
+
 }

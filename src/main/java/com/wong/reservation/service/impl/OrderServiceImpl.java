@@ -3,17 +3,21 @@ package com.wong.reservation.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wong.reservation.constant.OrderStatusConstant;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Order;
 import com.wong.reservation.mapper.OrderMapper;
 import com.wong.reservation.service.OrderService;
+import com.wong.reservation.utils.RedisUtils;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+
+import static com.wong.reservation.constant.SystemConstant.ORDER_CREATED_PREFIX;
 
 /**
  * @author Wongbuer
@@ -22,6 +26,8 @@ import java.util.Map;
  */
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements OrderService {
+    @Resource
+    private RedisUtils redisUtils;
 
     @Override
     public Result<List<Order>> getOrderByUserId(String status, Boolean sort) {
@@ -46,7 +52,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     @Override
-    public Result<?> addOrder(Order order) {
+    public Result<?> createOrder(Order order) {
         // 从登录信息获取userId
         Long userId = StpUtil.getLoginIdAsLong();
         order.setUserId(userId);
@@ -72,8 +78,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         // TODO: 判断员工时间是否冲突
         try {
+            // 设置订单状态为created
+            order.setStatus(OrderStatusConstant.CREATED);
             // 添加订单
             save(order);
+            // 添加订单到redis, 15分钟后过期, 到期未接受则改变订单状态
+            redisUtils.set(ORDER_CREATED_PREFIX + order.getId(), order, 60 * 15);
         } catch (Exception e) {
             // TODO: 日志处理
             e.printStackTrace();

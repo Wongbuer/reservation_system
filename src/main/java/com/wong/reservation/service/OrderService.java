@@ -28,7 +28,7 @@ public interface OrderService extends IService<Order> {
      * @param order 订单
      * @return Result<?> 添加结果
      */
-    Result<?> addOrder(Order order);
+    Result<?> createOrder(Order order);
 
     /**
      * 更新订单

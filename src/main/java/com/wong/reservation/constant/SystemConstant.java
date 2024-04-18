@@ -7,4 +7,6 @@ package com.wong.reservation.constant;
 public class SystemConstant {
     public static final String SMS_LOGIN_PREFIX = "reservation:sms:login:";
     public static final String CAPTCHA_PREFIX = "reservation:captcha";
+    public static final String ORDER_CREATED_PREFIX = "reservation:order:created:";
+    public static final String ORDER_ACCEPTED_PREFIX = "reservation:order:accepted:";
 }

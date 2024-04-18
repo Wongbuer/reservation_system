@@ -57,11 +57,16 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
         if (order.getStatus() == OrderStatusConstant.CREATED) {
             // 修改订单状态
             wrapper.set(Order::getStatus, OrderStatusConstant.TIMEOUT_CREATED);
+            updateOrderStatus(wrapper);
         } else if (order.getStatus() == OrderStatusConstant.ACCEPTED) {
             wrapper.set(Order::getStatus, OrderStatusConstant.TIMEOUT_PAYMENT);
+            updateOrderStatus(wrapper);
         } else {
-            log.info("订单状态已变化: {}", order);
+            log.info("订单状态已变化, 已经为: {}", OrderStatusConstant.getStatusName(order.getStatus()));
         }
+    }
+
+    private void updateOrderStatus(LambdaUpdateWrapper<Order> wrapper) {
         try {
             orderService.update(wrapper);
         } catch (Exception e) {

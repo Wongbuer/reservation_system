@@ -45,4 +45,12 @@ public interface OrderService extends IService<Order> {
      * @return Result<?> 删除结果
      */
     Result<?> deleteOrder(Long id);
+
+    /**
+     * 接受订单
+     *
+     * @param id 订单ID
+     * @return Result<?> 接受订单结果
+     */
+    Result<?> acceptOrder(Long id);
 }

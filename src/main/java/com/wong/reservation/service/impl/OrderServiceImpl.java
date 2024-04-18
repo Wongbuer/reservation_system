@@ -3,20 +3,24 @@ package com.wong.reservation.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wong.reservation.constant.OrderStatusConstant;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Order;
 import com.wong.reservation.mapper.OrderMapper;
+import com.wong.reservation.service.EmployeeService;
 import com.wong.reservation.service.OrderService;
 import com.wong.reservation.utils.RedisUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+import static com.wong.reservation.constant.SystemConstant.ORDER_ACCEPTED_PREFIX;
 import static com.wong.reservation.constant.SystemConstant.ORDER_CREATED_PREFIX;
 
 /**
@@ -28,6 +32,8 @@ import static com.wong.reservation.constant.SystemConstant.ORDER_CREATED_PREFIX;
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements OrderService {
     @Resource
     private RedisUtils redisUtils;
+    @Resource
+    private EmployeeService employeeService;
 
     @Override
     public Result<List<Order>> getOrderByUserId(String status, Boolean sort) {
@@ -130,6 +136,33 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .eq(Order::getId, id);
         boolean isDeleted = remove(wrapper);
         return isDeleted ? Result.success("删除订单成功") : Result.fail("删除订单失败");
+    }
+
+    @Override
+    public Result<?> acceptOrder(Long id) {
+        // 获取employeeId
+        long employeeId = employeeService.getEmployeeId();
+        // 获取订单
+        Order order = getById(id);
+        // 判断订单状态
+        if (ObjectUtils.isEmpty(order)) {
+            return Result.fail(40000, "订单不存在");
+        }
+        if (order.getStatus() != OrderStatusConstant.CREATED) {
+            return Result.fail(40000, "订单状态错误");
+        }
+        // 修改订单状态
+        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+        wrapper
+                .eq(Order::getId, id)
+                .set(Order::getStatus, OrderStatusConstant.ACCEPTED);
+        if (!update(wrapper)) {
+            return Result.fail(50000, "接受订单失败");
+        } else {
+            // 设置redis过期时间(15分钟内未付款自动取消订单)
+            redisUtils.set(ORDER_ACCEPTED_PREFIX + id, order, 60 * 15);
+            return Result.success("接受订单成功");
+        }
     }
 
     private boolean checkDuplicateOrder(Order order) {

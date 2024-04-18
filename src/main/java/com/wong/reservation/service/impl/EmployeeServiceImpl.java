@@ -12,6 +12,7 @@ import com.wong.reservation.service.EmployeeService;
 import com.wong.reservation.service.EmployeeServiceService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
@@ -63,11 +64,15 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     }
 
 
-    private long getEmployeeId() {
+    @Override
+    public Long getEmployeeId() {
         // 获取用户id
         long userId = StpUtil.getLoginIdAsLong();
         // 查找对应employeeId并设置
         Employee employee = getOne(new LambdaQueryWrapper<Employee>().eq(Employee::getUserId, userId));
+        if (ObjectUtils.isEmpty(employee)) {
+            throw new RuntimeException("该用户未绑定员工");
+        }
         return employee.getId();
     }
 }

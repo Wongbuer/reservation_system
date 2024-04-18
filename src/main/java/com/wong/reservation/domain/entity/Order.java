@@ -102,7 +102,7 @@ public class Order implements Serializable {
     /**
      * 是否已删除
      */
-    @TableLogic(value = "is_deleted")
+    @TableLogic(value = "0", delval = "1")
     private Integer isDeleted;
     /**
      * 创建时间

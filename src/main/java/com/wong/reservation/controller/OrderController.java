@@ -47,6 +47,18 @@ public class OrderController {
         return orderService.createOrder(order);
     }
 
+    /**
+     * 接受订单
+     *
+     * @param id 订单ID
+     * @return Result<?> 接受订单结果
+     */
+    @Operation(summary = "接受订单")
+    @RequestMapping(value = "/accept", method = RequestMethod.GET)
+    public Result<?> acceptOrder(Long id) {
+        return orderService.acceptOrder(id);
+    }
+
 
     /**
      * 修改订单

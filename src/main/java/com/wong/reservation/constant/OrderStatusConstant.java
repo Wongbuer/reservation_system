@@ -46,14 +46,14 @@ public class OrderStatusConstant {
      */
     public static final int TIMEOUT_EVALUATED = 9;
 
-    public boolean isTerminal(int status) {
+    public static boolean isTerminal(int status) {
         return switch (status) {
             case TIMEOUT_CREATED, TIMEOUT_PAYMENT, REFUNDED, EVALUATED, TIMEOUT_EVALUATED -> true;
             default -> false;
         };
     }
 
-    public int getNextStatus(int status) {
+    public static int getNextStatus(int status) {
         return switch (status) {
             case CREATED -> ACCEPTED;
             case ACCEPTED -> PAID;
@@ -61,6 +61,22 @@ public class OrderStatusConstant {
             case PENDING -> NOT_EVALUATED;
             case NOT_EVALUATED -> EVALUATED;
             default -> status;
+        };
+    }
+
+    public static String getStatusName(int status) {
+        return switch (status) {
+            case CREATED -> "已创建";
+            case ACCEPTED -> "已接受";
+            case TIMEOUT_CREATED -> "已超时(未接受)";
+            case TIMEOUT_PAYMENT -> "已超时(未付款)";
+            case PAID -> "已支付";
+            case REFUNDED -> "已退款";
+            case PENDING -> "使用中";
+            case NOT_EVALUATED -> "已使用(未评价)";
+            case EVALUATED -> "已评价";
+            case TIMEOUT_EVALUATED -> "已超时(未评价)";
+            default -> throw new IllegalStateException("Unexpected value: " + status);
         };
     }
 }

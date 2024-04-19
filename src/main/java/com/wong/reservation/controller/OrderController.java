@@ -5,6 +5,7 @@ import com.wong.reservation.domain.entity.Order;
 import com.wong.reservation.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,6 +58,18 @@ public class OrderController {
     @RequestMapping(value = "/accept", method = RequestMethod.GET)
     public Result<?> acceptOrder(Long id) {
         return orderService.acceptOrder(id);
+    }
+
+    /**
+     * 支付订单
+     *
+     * @param id 订单ID
+     * @return Result<?> 支付结果
+     */
+    @Operation(summary = "支付订单")
+    @RequestMapping(value = "/pay", method = RequestMethod.GET)
+    public Result<?> payOrder(Long id, HttpServletResponse response) {
+        return orderService.payOrder(id, response);
     }
 
 

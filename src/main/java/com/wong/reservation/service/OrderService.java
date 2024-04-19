@@ -4,6 +4,7 @@ package com.wong.reservation.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Order;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
@@ -53,4 +54,13 @@ public interface OrderService extends IService<Order> {
      * @return Result<?> 接受订单结果
      */
     Result<?> acceptOrder(Long id);
+
+    /**
+     * 支付订单
+     *
+     * @param id       订单ID
+     * @param response
+     * @return Result<?> 支付结果
+     */
+    Result<?> payOrder(Long id, HttpServletResponse response);
 }

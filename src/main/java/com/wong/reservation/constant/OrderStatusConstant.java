@@ -1,5 +1,7 @@
 package com.wong.reservation.constant;
 
+import java.util.List;
+
 /**
  * @author Wongbuer
  * @createDate 2024/4/17
@@ -78,5 +80,13 @@ public class OrderStatusConstant {
             case TIMEOUT_EVALUATED -> "已超时(未评价)";
             default -> throw new IllegalStateException("Unexpected value: " + status);
         };
+    }
+
+    public static List<Integer> getTerminalStatus() {
+        return List.of(TIMEOUT_CREATED, TIMEOUT_PAYMENT, REFUNDED, EVALUATED, TIMEOUT_EVALUATED);
+    }
+
+    public static List<Integer> getNotYetPendingStatus() {
+        return List.of(ACCEPTED, PAID);
     }
 }

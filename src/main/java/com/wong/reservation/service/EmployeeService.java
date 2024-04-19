@@ -45,5 +45,10 @@ public interface EmployeeService extends IService<Employee> {
      */
     Result<List<com.wong.reservation.domain.entity.EmployeeService>> getServiceList();
 
+    /**
+     * 获取当前用户对应员工的id
+     *
+     * @return Long 员工id
+     */
     Long getEmployeeId();
 }

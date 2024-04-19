@@ -5,6 +5,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.wong.reservation.domain.properties.RedissonProperties;
+import jakarta.annotation.Resource;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -22,6 +27,9 @@ import java.time.format.DateTimeFormatter;
  */
 @Configuration
 public class RedisConfig {
+    @Resource
+    private RedissonProperties redissonProperties;
+
     /**
      * 自定义redisTemplate
      *
@@ -66,5 +74,21 @@ public class RedisConfig {
         RedisMessageListenerContainer listenerContainer = new RedisMessageListenerContainer();
         listenerContainer.setConnectionFactory(redisConnectionFactory);
         return listenerContainer;
+    }
+
+    /**
+     * 配置redisson客户端
+     *
+     * @return RedissonClient redisson客户端
+     */
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config
+                .useSingleServer()
+                .setAddress(redissonProperties.getAddress())
+                .setPassword(redissonProperties.getPassword())
+                .setDatabase(redissonProperties.getDatabase());
+        return Redisson.create(config);
     }
 }

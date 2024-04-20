@@ -1,5 +1,6 @@
 package com.wong.reservation.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.wong.reservation.domain.dto.CaptchaDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.service.CaptchaService;
@@ -17,6 +18,7 @@ import java.util.Map;
  * @author Wongbuer
  * @createDate 2024/4/11
  */
+@SaIgnore
 @RestController
 @RequestMapping(value = "/captcha", method = {RequestMethod.GET, RequestMethod.POST})
 public class CaptchaController {

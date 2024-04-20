@@ -1,5 +1,6 @@
 package com.wong.reservation.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.wong.reservation.domain.dto.LoginDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.dto.SignUpDTO;
@@ -18,6 +19,7 @@ import java.io.IOException;
 /**
  * @author Wongbuer
  */
+@SaIgnore
 @RestController
 @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
 public class LoginController {

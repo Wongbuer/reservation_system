@@ -22,7 +22,7 @@ public class Order implements Serializable {
     /**
      * 订单表主键
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     /**
      * 用户id
@@ -79,6 +79,11 @@ public class Order implements Serializable {
      */
     @TableField(value = "payment")
     private BigDecimal payment;
+    /**
+     * 服务的时间单位数
+     */
+    @TableField(value = "unit_count")
+    private Integer unitCount;
     /**
      * 付款类型(先用后付, 先付后用)
      */

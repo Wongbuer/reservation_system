@@ -2,8 +2,9 @@ package com.wong.reservation.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wong.reservation.domain.entity.Order;
-import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -14,6 +15,8 @@ import java.util.Map;
  */
 public interface OrderMapper extends BaseMapper<Order> {
     Map<String, Long> isOrderInfoValid(Order order);
+
+    BigDecimal getOrderPrice(@Param("unitCount") Integer unitCount, @Param("serviceId") Long serviceId);
 }
 
 

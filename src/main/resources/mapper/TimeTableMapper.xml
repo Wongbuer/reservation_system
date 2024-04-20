@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wong.reservation.mapper.TimeTableMapper">
+
+    <resultMap id="BaseResultMap" type="com.wong.reservation.domain.entity.TimeTable">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="orderId" column="order_id" jdbcType="BIGINT"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,order_id,start_time,
+        end_time
+    </sql>
+    <select id="checkConflict" resultMap="BaseResultMap">
+        select distinct new_start as start_time, new_end as end_time
+        from reservation_system.time_table,
+             (select #{reservationTime} new_start,
+                     CASE
+                         WHEN time_uint = 'hour' THEN DATE_ADD(#{reservationTime}, INTERVAL 3 HOUR)
+                         WHEN time_uint = 'minute' THEN DATE_ADD(#{reservationTime}, INTERVAL 3 MINUTE)
+                         END AS         new_end
+              from reservation_system.employee_service es
+              where employee_id = #{employeeId}
+                and service_id = #{serviceId}) as nsie
+        where not ((new_start &lt; start_time and start_time &lt; new_end)
+            or (start_time &lt; new_start and new_end &lt; end_time)
+            or (start_time &lt; new_start and end_time &lt; new_end and new_start &lt; end_time))
+    </select>
+</mapper>

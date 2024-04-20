@@ -16,6 +16,7 @@
         <result property="acceptedTime" column="accepted_time" jdbcType="TIMESTAMP"/>
         <result property="addressId" column="address_id" jdbcType="BIGINT"/>
         <result property="payment" column="payment" jdbcType="DECIMAL"/>
+        <result property="unitCount" column="unit_count" jdbcType="INTEGER"/>
         <result property="paymentType" column="payment_type" jdbcType="INTEGER"/>
         <result property="serviceCharge" column="service_charge" jdbcType="DECIMAL"/>
         <result property="status" column="status" jdbcType="INTEGER"/>
@@ -43,5 +44,11 @@
                       WHERE a.id = #{addressId}
                         AND a.user_id = #{userId}) AS address_exists,
                #{reservationTime} > NOW()          AS future_check
+    </select>
+    <select id="getOrderPrice" resultType="java.math.BigDecimal">
+        SELECT price * #{unitCount}
+        FROM reservation_system.service s
+                 JOIN reservation_system.employee_service es ON s.id = es.service_id
+        WHERE S.id = #{serviceId}
     </select>
 </mapper>

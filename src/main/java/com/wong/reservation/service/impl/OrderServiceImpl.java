@@ -2,38 +2,58 @@ package com.wong.reservation.service.impl;
 
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.lang.Snowflake;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wong.reservation.constant.OrderStatusConstant;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Order;
+import com.wong.reservation.domain.entity.TimeTable;
 import com.wong.reservation.mapper.OrderMapper;
 import com.wong.reservation.service.EmployeeService;
 import com.wong.reservation.service.OrderService;
+import com.wong.reservation.service.ServiceService;
+import com.wong.reservation.service.TimeTableService;
 import com.wong.reservation.utils.RedisUtils;
+import com.wong.reservation.utils.lock.OrderLock;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-import static com.wong.reservation.constant.SystemConstant.ORDER_ACCEPTED_PREFIX;
-import static com.wong.reservation.constant.SystemConstant.ORDER_CREATED_PREFIX;
+import static com.wong.reservation.constant.SystemConstant.*;
 
 /**
  * @author Wongbuer
  * @description 针对表【orders】的数据库操作Service实现
  * @createDate 2024-04-15 18:05:22
  */
+@Slf4j
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements OrderService {
     @Resource
     private RedisUtils redisUtils;
     @Resource
     private EmployeeService employeeService;
+    @Resource
+    private OrderLock orderLock;
+    @Resource
+    private ServiceService serviceService;
+    @Resource
+    private TimeTableService timeTableService;
+    @Resource
+    private Snowflake snowflake;
 
     @Override
     public Result<List<Order>> getOrderByUserId(String status, Boolean sort) {
@@ -62,6 +82,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 从登录信息获取userId
         Long userId = StpUtil.getLoginIdAsLong();
         order.setUserId(userId);
+        // 根据雪花算法生成orderId
+        order.setId(snowflake.nextId());
 
         // 判断order是否含有必要参数(地址ID是否存在/服务ID是否存在/用户ID是否存在/员工ID是否存在/时间是否合法)
         int validCode = isOrderInfoValid(order);
@@ -82,20 +104,44 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (checkDuplicateOrder(order)) {
             return Result.fail("订单重复, 请勿重复下单");
         }
-        // TODO: 判断员工时间是否冲突
-        try {
-            // 设置订单状态为created
-            order.setStatus(OrderStatusConstant.CREATED);
-            // 添加订单
-            save(order);
-            // 添加订单到redis, 15分钟后过期, 到期未接受则改变订单状态
-            redisUtils.set(ORDER_CREATED_PREFIX + order.getId(), order, 60 * 15);
-        } catch (Exception e) {
-            // TODO: 日志处理
-            e.printStackTrace();
-            return Result.fail(50000, "添加订单失败");
+
+        String lockKey = ORDER_LOCK_CREATE_PREFIX + order.getId();
+        // 获取锁
+        boolean isLocked = orderLock.acquireLock(lockKey, 5000);
+
+        if (isLocked) {
+            try {
+                log.info("进入锁");
+                // 判断金额是否正确
+                if (!isOrderPriceValid(order)) {
+                    return Result.fail("订单金额有误");
+                }
+                // 判断员工时间是否冲突
+                TimeTable timeTable = timeTableService.checkConflictAndCreateTimeTable(order);
+                if (ObjectUtils.isEmpty(timeTable)) {
+                    return Result.fail(40000, "员工时间冲突");
+                }
+                // 设置订单状态为created
+                order.setStatus(OrderStatusConstant.CREATED);
+                TimeUnit.SECONDS.sleep(13);
+                // 添加订单
+                save(order);
+                // 添加时间表
+                timeTable.setOrderId(order.getId());
+                timeTableService.save(timeTable);
+                // 添加订单到redis, 15分钟后过期, 到期未接受则改变订单状态
+                redisUtils.set(ORDER_CREATED_PREFIX + order.getId(), order, 60 * 15);
+            } catch (Exception e) {
+                // TODO: 日志处理
+                e.printStackTrace();
+                return Result.fail(50000, "添加订单失败");
+            } finally {
+                orderLock.releaseLock(lockKey);
+            }
+            return Result.success("添加订单成功");
+        } else {
+            return Result.fail("订单创建失败, 请稍后再试");
         }
-        return Result.success("添加订单成功");
     }
 
     @Override
@@ -165,6 +211,43 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
     }
 
+    @Override
+    public Result<?> payOrder(Long id, HttpServletResponse response) {
+        // 加锁
+        String lockKey = ORDER_LOCK_PAY_PREFIX + id;
+        boolean isLocked = orderLock.acquireLock(lockKey, 5000);
+        if (isLocked) {
+            try {
+                // 获取订单
+                Order order = getById(id);
+                if (ObjectUtils.isEmpty(order)) {
+                    return Result.fail(40000, "订单不存在");
+                }
+                // 判断状态
+                if (order.getStatus() != OrderStatusConstant.ACCEPTED) {
+                    return Result.fail(40000, "订单状态错误");
+                }
+                TimeUnit.SECONDS.sleep(60);
+                // 生成支付信息(traceNo/totalAmount/subject)
+                LocalDateTime reservationTime = order.getReservationTime();
+                double totalAmount = order.getPayment().doubleValue();
+                String serviceName = serviceService.getById(order.getServiceId()).getName();
+                String traceNo = UUID.randomUUID().toString();
+                String subject = "预约" + serviceName + "服务" + " " + reservationTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                // TODO: 重定向到支付页面
+                log.info("跳转至支付界面");
+                return Result.success("跳转至支付界面");
+            } catch (Exception e) {
+                return Result.fail(50000, "订单支付失败");
+            } finally {
+                // 释放锁
+                orderLock.releaseLock(lockKey);
+            }
+        } else {
+            return Result.fail(50000, "订单支付失败");
+        }
+    }
+
     private boolean checkDuplicateOrder(Order order) {
         LambdaQueryWrapper<Order> orderWrapper = new LambdaQueryWrapper<>();
         orderWrapper
@@ -193,7 +276,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     private int isOrderInfoValid(Order order) {
+        // 判断是否存在地址/服务/用户/员工/预约时间
         if (order.getAddressId() == null || order.getServiceId() == null || order.getUserId() == null || order.getEmployeeId() == null || order.getReservationTime() == null) {
+            return -1;
+        }
+        // 判断是否存在支付金额/支付方式/服务单位数
+        if (ObjectUtils.isEmpty(order.getPayment()) || ObjectUtils.isEmpty(order.getPaymentType()) || ObjectUtils.isEmpty(order.getUnitCount())) {
             return -1;
         }
         Map<String, Long> map = baseMapper.isOrderInfoValid(order);
@@ -208,6 +296,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             res += 1;
         }
         return res;
+    }
+
+    private boolean isOrderPriceValid(Order order) {
+        // 判断是否为空
+        BigDecimal bigDecimal = baseMapper.getOrderPrice(order.getUnitCount(), order.getServiceId());
+        return bigDecimal.compareTo(order.getPayment()) == 0;
     }
 }
 

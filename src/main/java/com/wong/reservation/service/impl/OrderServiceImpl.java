@@ -105,7 +105,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             return Result.fail("订单重复, 请勿重复下单");
         }
 
-        String lockKey = ORDER_LOCK_CREATE_PREFIX + order.getId();
+        String lockKey = ORDER_LOCK_CREATE_PREFIX + order.getEmployeeId();
         // 获取锁
         boolean isLocked = orderLock.acquireLock(lockKey, 5000);
 

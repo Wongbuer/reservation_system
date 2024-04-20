@@ -3,11 +3,12 @@ package com.wong.reservation.utils.lock.impl.local;
 import com.wong.reservation.utils.lock.OrderLock;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Wongbuer
@@ -15,17 +16,23 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Getter
 public abstract class ReentrantOrderLock implements OrderLock {
-    private final Map<Long, Lock> lockMap;
+    private final Map<String, Lock> lockMap;
 
-    protected ReentrantOrderLock(Map<Long, Lock> lockMap) {
+    protected ReentrantOrderLock(Map<String, Lock> lockMap) {
         this.lockMap = lockMap;
     }
 
     @Override
     public boolean acquireLock(String key, long waitTime) {
-        // 正则表达式提取key中的Long型orderId
-        Long orderId = Long.parseLong(key.replaceAll("[^0-9]", ""));
-        Lock lock = lockMap.computeIfAbsent(orderId, k -> new ReentrantLock());
+        Pattern pattern = Pattern.compile("(?<=:)(\\w+:\\d+)");
+        Matcher matcher = pattern.matcher(key);
+        String lockKey = null;
+        if (matcher.find()) {
+            lockKey = matcher.group();
+        } else {
+            throw new IllegalArgumentException("可重入锁key异常");
+        }
+        Lock lock = lockMap.computeIfAbsent(lockKey, k -> new ReentrantLock());
         try {
             return lock.tryLock(waitTime, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -37,8 +44,15 @@ public abstract class ReentrantOrderLock implements OrderLock {
 
     @Override
     public void releaseLock(String key) {
-        Long orderId = Long.parseLong(key.replaceAll("[^0-9]", ""));
-        Lock lock = lockMap.get(orderId);
+        Pattern pattern = Pattern.compile("(?<=:)(\\w+:\\d+)");
+        Matcher matcher = pattern.matcher(key);
+        String lockKey = null;
+        if (matcher.find()) {
+            lockKey = matcher.group();
+        } else {
+            throw new IllegalArgumentException("订单id异常");
+        }
+        Lock lock = lockMap.get(lockKey);
         if (lock != null) {
             lock.unlock();
         }
@@ -46,11 +60,13 @@ public abstract class ReentrantOrderLock implements OrderLock {
 
     @Override
     public boolean isLocked(String key) {
-        Long orderId = Long.parseLong(key.replaceAll("[^0-9]", ""));
-        if (lockMap.get(orderId) instanceof ReentrantLock) {
-            return ((ReentrantLock) lockMap.get(orderId)).isLocked();
+        Pattern pattern = Pattern.compile("(?<=:)(\\w+:\\d+)");
+        Matcher matcher = pattern.matcher(key);
+        String lockKey = matcher.group();
+        if (lockMap.get(lockKey) instanceof ReentrantLock) {
+            return ((ReentrantLock) lockMap.get(lockKey)).isLocked();
         } else {
-           return false;
+            return false;
         }
     }
 

@@ -16,7 +16,7 @@ public class ReentrantLruOrderLock extends ReentrantOrderLock{
         super(new LinkedHashMap<>(maxSize){
             // 配置LRU
             @Override
-            protected boolean removeEldestEntry(Map.Entry<Long, Lock> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String, Lock> eldest) {
                 if (log.isTraceEnabled() && size() > maxSize) {
                     log.trace("订单锁达到配置额, 开始运行LRU清除最近最久未使用订单, 订单ID: {}", eldest.getKey());
                 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "order")
+@ConfigurationProperties(prefix = "order.lock")
 public class LockProperties {
     private String lockType = "local";
     private String lockRemoveType = "scheduled";

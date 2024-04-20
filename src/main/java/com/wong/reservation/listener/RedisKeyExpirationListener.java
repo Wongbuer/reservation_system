@@ -46,7 +46,11 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
             type = ORDER_LOCK_PAY_PREFIX;
             // 获取value
             orderId = redisKey.substring(ORDER_ACCEPTED_PREFIX.length());
-        } else {
+        } else if (redisKey.startsWith(ORDER_EVALUATE_PREFIX)) {
+            type = ORDER_LOCK_EVALUATE_PREFIX;
+            orderId = redisKey.substring(ORDER_EVALUATE_PREFIX.length());
+        }
+        else {
             return;
         }
         // 获取订单
@@ -76,6 +80,13 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                             .eq(Order::getStatus, OrderStatusConstant.ACCEPTED)
                             // 修改订单状态
                             .set(Order::getStatus, OrderStatusConstant.TIMEOUT_PAYMENT);
+                    updateOrderStatus(wrapper);
+                } else if (order.getStatus() == OrderStatusConstant.NOT_EVALUATED) {
+                    wrapper
+                            // 再次确认订单状态正确
+                            .eq(Order::getStatus, OrderStatusConstant.NOT_EVALUATED)
+                            // 修改订单状态
+                            .set(Order::getStatus, OrderStatusConstant.TIMEOUT_EVALUATED);
                     updateOrderStatus(wrapper);
                 } else {
                     log.info("订单状态已变化, 已经为: {}", OrderStatusConstant.getStatusName(order.getStatus()));

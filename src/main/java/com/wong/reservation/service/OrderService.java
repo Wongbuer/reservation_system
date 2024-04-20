@@ -3,6 +3,7 @@ package com.wong.reservation.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.wong.reservation.domain.dto.Result;
+import com.wong.reservation.domain.entity.Evaluation;
 import com.wong.reservation.domain.entity.Order;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -62,4 +63,28 @@ public interface OrderService extends IService<Order> {
      * @param response httpServletResponse http响应
      */
     void payOrder(Long id, HttpServletResponse response);
+
+    /**
+     * 显示二维码
+     *
+     * @param id       订单ID
+     * @param response httpServletResponse http响应
+     */
+    void showQrCode(Long id, HttpServletResponse response);
+
+    /**
+     * 解析二维码
+     *
+     * @param content 二维码正文
+     * @return Result<?> 解析二维码之后的处理结果
+     */
+    Result<?> parseQrCode(String content);
+
+    /**
+     * 评价订单
+     *
+     * @param evaluation 订单评价
+     * @return Result<?> 评价结果
+     */
+    Result<?> evaluateOrder(Evaluation evaluation);
 }

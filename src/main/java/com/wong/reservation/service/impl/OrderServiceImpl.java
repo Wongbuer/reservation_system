@@ -2,27 +2,40 @@ package com.wong.reservation.service.impl;
 
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.lang.Snowflake;
+import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wong.reservation.constant.OrderStatusConstant;
 import com.wong.reservation.domain.dto.AliPayDTO;
 import com.wong.reservation.domain.dto.Result;
+import com.wong.reservation.domain.entity.Evaluation;
 import com.wong.reservation.domain.entity.Order;
 import com.wong.reservation.domain.entity.TimeTable;
 import com.wong.reservation.mapper.OrderMapper;
 import com.wong.reservation.service.*;
 import com.wong.reservation.utils.RedisUtils;
 import com.wong.reservation.utils.lock.OrderLock;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.Resource;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.ObjectUtils;
 
+import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -38,6 +51,7 @@ import static com.wong.reservation.constant.SystemConstant.*;
 @Slf4j
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements OrderService {
+    private static SecretKey KEY = Keys.hmacShaKeyFor(QR_CODE_SHA256_SECRET.getBytes(StandardCharsets.UTF_8));
     @Resource
     private RedisUtils redisUtils;
     @Resource
@@ -49,9 +63,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Resource
     private TimeTableService timeTableService;
     @Resource
+    private EvaluationService evaluationService;
+    @Resource
     private AliPayService aliPayService;
     @Resource
     private Snowflake snowflake;
+    @Resource
+    private PlatformTransactionManager transactionManager;
 
     @Override
     public Result<List<Order>> getOrderByUserId(String status, Boolean sort) {
@@ -108,6 +126,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         boolean isLocked = orderLock.acquireLock(lockKey, 5000);
 
         if (isLocked) {
+            TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
             try {
                 log.info("进入锁");
                 // 判断金额是否正确
@@ -128,9 +147,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 timeTableService.save(timeTable);
                 // 添加订单到redis, 15分钟后过期, 到期未接受则改变订单状态
                 redisUtils.set(ORDER_CREATED_PREFIX + order.getId(), order, 60 * 15);
+                transactionManager.commit(status);
             } catch (Exception e) {
                 // TODO: 日志处理
                 e.printStackTrace();
+                transactionManager.rollback(status);
                 return Result.fail(50000, "添加订单失败");
             } finally {
                 orderLock.releaseLock(lockKey);
@@ -261,6 +282,91 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         } else {
             Result.fail(50000, "订单支付失败", response);
         }
+    }
+
+    @Override
+    public void showQrCode(Long id, HttpServletResponse response) {
+        String encodedString = Jwts
+                .builder()
+                .signWith(KEY)
+                .claims(Map.of("orderId", id))
+                .compact();
+        ServletOutputStream out;
+        try {
+            out = response.getOutputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        QrCodeUtil.generate(encodedString, 300, 300, ImgUtil.IMAGE_TYPE_PNG, out);
+    }
+
+    @Override
+    public Result<?> parseQrCode(String content) {
+        Claims payload = (Claims) Jwts.parser()
+                .verifyWith(KEY)
+                .build().parse(content).getPayload();
+        Long orderId = payload.get("orderId", Long.class);
+        // 从数据库获取订单信息
+        Order order = getById(orderId);
+        if (ObjectUtils.isEmpty(order)) {
+            return Result.fail(40000, "订单不存在");
+        }
+        // 判断订单状态
+        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(Order::getId, orderId);
+        if (order.getStatus() == OrderStatusConstant.PAID) {
+            wrapper.set(Order::getStatus, OrderStatusConstant.PENDING);
+        } else if (order.getStatus() == OrderStatusConstant.PENDING) {
+            // 判断是否到服务结束时间
+            TimeTable timeTable = timeTableService.getOne(new LambdaQueryWrapper<TimeTable>().eq(TimeTable::getOrderId, orderId));
+            if (LocalDateTime.now().isBefore(timeTable.getEndTime())) {
+                return Result.fail(40000, "服务未结束");
+            }
+            wrapper
+                    .set(Order::getStatus, OrderStatusConstant.NOT_EVALUATED)
+                    .set(Order::getEndTime, LocalDateTime.now());
+        } else {
+            return Result.fail(40000, "订单状态错误");
+        }
+        // 改变订单状态
+        boolean isUpdated = update(wrapper);
+        if (isUpdated && order.getStatus() == OrderStatusConstant.PENDING) {
+            // 设置评价过期时间(24小时)
+            redisUtils.set(ORDER_EVALUATE_PREFIX + orderId, order, 60 * 60 * 24);
+        }
+        // 返回处理结果
+        return isUpdated ? Result.success("订单状态修改成功") : Result.fail(50000, "订单状态修改失败");
+    }
+
+    @Override
+    public Result<?> evaluateOrder(Evaluation evaluation) {
+        if (evaluation.getOrderId() == null) {
+            return Result.fail(40000, "订单ID不能为空");
+        }
+        Result<?> result;
+        String lockKey = ORDER_LOCK_EVALUATE_PREFIX + evaluation.getOrderId();
+        boolean isLocked = orderLock.acquireLock(lockKey, 5000);
+        if (isLocked) {
+            TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+            try {
+                result = evaluationService.addEvaluation(evaluation);
+                LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+                wrapper
+                        .eq(Order::getId, evaluation.getOrderId())
+                        .set(Order::getStatus, OrderStatusConstant.EVALUATED);
+                update(wrapper);
+                transactionManager.commit(status);
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                return Result.fail(50000, "订单评价失败");
+            } finally {
+                orderLock.releaseLock(lockKey);
+            }
+        } else {
+            return Result.fail(50000, "订单评价失败");
+        }
+        return result;
+        // TODO: 计算员工评分或相关逻辑
     }
 
     private boolean checkDuplicateOrder(Order order) {

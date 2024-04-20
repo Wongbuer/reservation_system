@@ -7,14 +7,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wong.reservation.constant.OrderStatusConstant;
+import com.wong.reservation.domain.dto.AliPayDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Order;
 import com.wong.reservation.domain.entity.TimeTable;
 import com.wong.reservation.mapper.OrderMapper;
-import com.wong.reservation.service.EmployeeService;
-import com.wong.reservation.service.OrderService;
-import com.wong.reservation.service.ServiceService;
-import com.wong.reservation.service.TimeTableService;
+import com.wong.reservation.service.*;
 import com.wong.reservation.utils.RedisUtils;
 import com.wong.reservation.utils.lock.OrderLock;
 import jakarta.annotation.Resource;
@@ -29,8 +27,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import static com.wong.reservation.constant.SystemConstant.*;
 
@@ -52,6 +48,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private ServiceService serviceService;
     @Resource
     private TimeTableService timeTableService;
+    @Resource
+    private AliPayService aliPayService;
     @Resource
     private Snowflake snowflake;
 
@@ -123,7 +121,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 }
                 // 设置订单状态为created
                 order.setStatus(OrderStatusConstant.CREATED);
-                TimeUnit.SECONDS.sleep(13);
                 // 添加订单
                 save(order);
                 // 添加时间表
@@ -188,31 +185,44 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public Result<?> acceptOrder(Long id) {
         // 获取employeeId
         long employeeId = employeeService.getEmployeeId();
-        // 获取订单
-        Order order = getById(id);
-        // 判断订单状态
-        if (ObjectUtils.isEmpty(order)) {
-            return Result.fail(40000, "订单不存在");
-        }
-        if (order.getStatus() != OrderStatusConstant.CREATED) {
-            return Result.fail(40000, "订单状态错误");
-        }
-        // 修改订单状态
-        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
-        wrapper
-                .eq(Order::getId, id)
-                .set(Order::getStatus, OrderStatusConstant.ACCEPTED);
-        if (!update(wrapper)) {
-            return Result.fail(50000, "接受订单失败");
+        String lockKey = ORDER_LOCK_ACCEPT_PREFIX + id;
+        boolean isLocked = orderLock.acquireLock(lockKey, 5000);
+        if (isLocked) {
+            try {
+                // 获取订单
+                Order order = getById(id);
+                // 判断订单状态
+                if (ObjectUtils.isEmpty(order)) {
+                    return Result.fail(40000, "订单不存在");
+                }
+                if (order.getStatus() != OrderStatusConstant.CREATED) {
+                    return Result.fail(40000, "订单状态错误");
+                }
+                // 修改订单状态
+                LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+                wrapper
+                        .eq(Order::getId, id)
+                        .set(Order::getAcceptedTime, LocalDateTime.now())
+                        .set(Order::getStatus, OrderStatusConstant.ACCEPTED);
+                if (!update(wrapper)) {
+                    return Result.fail(50000, "接受订单失败");
+                } else {
+                    // 设置redis过期时间(15分钟内未付款自动取消订单)
+                    redisUtils.set(ORDER_ACCEPTED_PREFIX + id, order, 60 * 15);
+                    return Result.success("接受订单成功");
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                orderLock.releaseLock(lockKey);
+            }
         } else {
-            // 设置redis过期时间(15分钟内未付款自动取消订单)
-            redisUtils.set(ORDER_ACCEPTED_PREFIX + id, order, 60 * 15);
-            return Result.success("接受订单成功");
+            return Result.fail("接受订单失败, 请稍后再试");
         }
     }
 
     @Override
-    public Result<?> payOrder(Long id, HttpServletResponse response) {
+    public void payOrder(Long id, HttpServletResponse response) {
         // 加锁
         String lockKey = ORDER_LOCK_PAY_PREFIX + id;
         boolean isLocked = orderLock.acquireLock(lockKey, 5000);
@@ -221,30 +231,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 // 获取订单
                 Order order = getById(id);
                 if (ObjectUtils.isEmpty(order)) {
-                    return Result.fail(40000, "订单不存在");
+                    Result.fail(40000, "订单不存在", response);
+                    return;
                 }
                 // 判断状态
                 if (order.getStatus() != OrderStatusConstant.ACCEPTED) {
-                    return Result.fail(40000, "订单状态错误");
+                    Result.fail(40000, "订单状态错误", response);
+                    return;
                 }
-                TimeUnit.SECONDS.sleep(60);
                 // 生成支付信息(traceNo/totalAmount/subject)
+                AliPayDTO aliPayDTO = new AliPayDTO();
                 LocalDateTime reservationTime = order.getReservationTime();
                 double totalAmount = order.getPayment().doubleValue();
                 String serviceName = serviceService.getById(order.getServiceId()).getName();
-                String traceNo = UUID.randomUUID().toString();
+                String traceNo = order.getId().toString();
                 String subject = "预约" + serviceName + "服务" + " " + reservationTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-                // TODO: 重定向到支付页面
-                log.info("跳转至支付界面");
-                return Result.success("跳转至支付界面");
+
+                aliPayDTO.setSubject(subject);
+                aliPayDTO.setTotalAmount(totalAmount);
+                aliPayDTO.setTraceNo(traceNo);
+                aliPayService.goToPay(aliPayDTO, response);
+                Result.success("跳转至支付界面", response);
             } catch (Exception e) {
-                return Result.fail(50000, "订单支付失败");
+                Result.fail(50000, "订单支付失败", response);
             } finally {
                 // 释放锁
                 orderLock.releaseLock(lockKey);
             }
         } else {
-            return Result.fail(50000, "订单支付失败");
+            Result.fail(50000, "订单支付失败", response);
         }
     }
 

@@ -16,18 +16,22 @@
         end_time
     </sql>
     <select id="checkConflict" resultMap="BaseResultMap">
-        select distinct new_start as start_time, new_end as end_time
-        from reservation_system.time_table,
-             (select #{reservationTime} new_start,
+        SELECT DISTINCT nsie.new_start AS start_time,
+                        nsie.new_end   AS end_time
+        FROM (SELECT #{reservationTime} AS new_start,
                      CASE
                          WHEN time_uint = 'hour' THEN DATE_ADD(#{reservationTime}, INTERVAL 3 HOUR)
                          WHEN time_uint = 'minute' THEN DATE_ADD(#{reservationTime}, INTERVAL 3 MINUTE)
-                         END AS         new_end
-              from reservation_system.employee_service es
-              where employee_id = #{employeeId}
-                and service_id = #{serviceId}) as nsie
-        where not ((new_start &lt; start_time and start_time &lt; new_end)
-            or (start_time &lt; new_start and new_end &lt; end_time)
-            or (start_time &lt; new_start and end_time &lt; new_end and new_start &lt; end_time))
+                         END            AS new_end
+              FROM reservation_system.employee_service es
+              WHERE employee_id = #{employeeId}
+                AND service_id = #{serviceId}) AS nsie
+                 LEFT JOIN reservation_system.time_table tt ON (
+            (nsie.new_start &lt; tt.start_time AND tt.start_time &lt; nsie.new_end)
+                OR (tt.start_time &lt; nsie.new_start AND nsie.new_end &lt; tt.end_time)
+                OR
+            (tt.start_time &lt; nsie.new_start AND tt.end_time &lt; nsie.new_end AND nsie.new_start &lt; tt.end_time)
+            )
+        WHERE tt.start_time IS NULL;
     </select>
 </mapper>

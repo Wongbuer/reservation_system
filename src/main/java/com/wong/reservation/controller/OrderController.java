@@ -64,12 +64,11 @@ public class OrderController {
      * 支付订单
      *
      * @param id 订单ID
-     * @return Result<?> 支付结果
      */
     @Operation(summary = "支付订单")
     @RequestMapping(value = "/pay", method = RequestMethod.GET)
-    public Result<?> payOrder(Long id, HttpServletResponse response) {
-        return orderService.payOrder(id, response);
+    public void payOrder(Long id, HttpServletResponse response) {
+        orderService.payOrder(id, response);
     }
 
 

@@ -59,8 +59,7 @@ public interface OrderService extends IService<Order> {
      * 支付订单
      *
      * @param id       订单ID
-     * @param response
-     * @return Result<?> 支付结果
+     * @param response httpServletResponse http响应
      */
-    Result<?> payOrder(Long id, HttpServletResponse response);
+    void payOrder(Long id, HttpServletResponse response);
 }

@@ -40,6 +40,7 @@ public class ReentrantScheduledOrderLock extends ReentrantOrderLock {
             // 根据员工id去除可重入锁
             getLockMap().remove("create:" + order.getEmployeeId());
             // 根据订单id去除可重入锁
+            getLockMap().remove("accept:" + order.getId());
             getLockMap().remove("pay:" + order.getId());
         }
         // 生成终止状态订单ID列表

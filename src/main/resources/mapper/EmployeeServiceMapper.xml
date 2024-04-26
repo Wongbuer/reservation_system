@@ -5,13 +5,53 @@
 <mapper namespace="com.wong.reservation.mapper.EmployeeServiceMapper">
 
     <resultMap id="BaseResultMap" type="com.wong.reservation.domain.entity.EmployeeService">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="employeeId" column="employee_id" jdbcType="BIGINT"/>
+        <result property="serviceId" column="service_id" jdbcType="BIGINT"/>
+        <result property="rate" column="rate" jdbcType="INTEGER"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="discount" column="discount" jdbcType="DECIMAL"/>
+        <result property="timeUint" column="time_uint" jdbcType="VARCHAR"/>
+        <result property="detailedPictures" column="detailed_pictures" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="recommendServiceMap" type="com.wong.reservation.domain.vo.RecommendServiceVO">
+        <id property="id" column="esid" jdbcType="BIGINT"/>
+        <result property="rate" column="rate" jdbcType="INTEGER"/>
+        <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="discount" column="discount" jdbcType="DECIMAL"/>
+        <result property="timeUint" column="time_uint" jdbcType="VARCHAR"/>
+        <result property="detailedPictures" column="detailed_pictures" jdbcType="VARCHAR"/>
+        <association property="employee" javaType="com.wong.reservation.domain.entity.Employee">
+            <id property="id" column="eid" jdbcType="BIGINT"/>
             <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="employeeId" column="employee_id" jdbcType="BIGINT"/>
-            <result property="serviceId" column="service_id" jdbcType="BIGINT"/>
-            <result property="price" column="price" jdbcType="DECIMAL"/>
-            <result property="timeUint" column="time_uint" jdbcType="VARCHAR"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="score" column="score" jdbcType="TINYINT"/>
             <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
             <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+        </association>
+        <association property="user" javaType="com.wong.reservation.domain.entity.User">
+            <id property="id" column="uid" jdbcType="BIGINT"/>
+            <result property="username" column="username" jdbcType="VARCHAR"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+            <result property="gender" column="gender" jdbcType="VARCHAR"/>
+            <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
+            <result property="email" column="email" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="defaultAddressId" column="default_address_id" jdbcType="BIGINT"/>
+            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+        </association>
+        <association property="service" javaType="com.wong.reservation.domain.entity.Service">
+            <id property="id" column="sid" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+        </association>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -19,4 +59,37 @@
         price,time_uint,created_at,
         updated_at
     </sql>
+
+    <select id="selectRecommendServiceList" resultMap="recommendServiceMap">
+        select u.id  uid,
+               username,
+               password,
+               nickname,
+               gender,
+               avatar,
+               email,
+               phone,
+               default_address_id,
+               e.id  eid,
+               o.user_id,
+               score,
+               es.id esid,
+               o.employee_id,
+               o.service_id,
+               price,
+               time_uint,
+               name,
+               discount,
+               es.rate,
+               description,
+               detailed_pictures
+        from reservation_system.employee_service es
+                 join reservation_system.service s on s.id = es.service_id
+                 join reservation_system.employee e on e.id = es.employee_id
+                 join reservation_system.user u on u.id = e.user_id
+                 join reservation_system.orders o on e.id = o.employee_id
+        where o.status = 8
+        order by o.end_time desc
+        limit 10;
+    </select>
 </mapper>

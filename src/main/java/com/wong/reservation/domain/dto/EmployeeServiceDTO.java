@@ -2,8 +2,10 @@ package com.wong.reservation.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author Wongbuer
@@ -21,4 +23,6 @@ public class EmployeeServiceDTO {
     private BigDecimal price;
     @Schema(title = "服务时间单位", name = "timeUint", example = "hour", requiredMode = Schema.RequiredMode.REQUIRED)
     private String timeUint;
+    @Schema(title = "服务详细介绍", name = "detailedPictures", requiredMode = Schema.RequiredMode.REQUIRED)
+    private List<MultipartFile> detailedPictures;
 }

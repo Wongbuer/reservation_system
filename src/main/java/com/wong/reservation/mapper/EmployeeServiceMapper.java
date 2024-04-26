@@ -1,7 +1,10 @@
 package com.wong.reservation.mapper;
 
-import com.wong.reservation.domain.entity.EmployeeService;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.wong.reservation.domain.entity.EmployeeService;
+import com.wong.reservation.domain.vo.RecommendServiceVO;
+
+import java.util.List;
 
 /**
 * @author Wongbuer
@@ -10,7 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity com.wong.reservation.domain.entity.EmployeeService
 */
 public interface EmployeeServiceMapper extends BaseMapper<EmployeeService> {
-
+    List<RecommendServiceVO> selectRecommendServiceList();
 }
 
 

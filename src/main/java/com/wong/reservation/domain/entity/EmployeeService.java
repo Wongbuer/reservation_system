@@ -38,10 +38,20 @@ public class EmployeeService implements Serializable {
     @TableField(value = "service_id")
     private Long serviceId;
     /**
+     * 服务评分
+     */
+    @TableField(value = "rate")
+    private Integer rate;
+    /**
      * 员工服务单价
      */
     @TableField(value = "price")
     private BigDecimal price;
+    /**
+     * 员工服务折扣
+     */
+     @TableField(value = "discount")
+    private BigDecimal discount;
     /**
      * 员工服务计价单位
      */
@@ -59,4 +69,9 @@ public class EmployeeService implements Serializable {
     @TableField(value = "updated_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+    /**
+     * 员工服务详细介绍图片
+     */
+    @TableField(value = "detailed_pictures")
+    private String detailedPictures;
 }

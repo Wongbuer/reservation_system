@@ -1,20 +1,14 @@
 package com.wong.reservation.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.wong.reservation.domain.dto.EmployeeServiceDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Employee;
 import com.wong.reservation.mapper.EmployeeMapper;
 import com.wong.reservation.service.EmployeeService;
-import com.wong.reservation.service.EmployeeServiceService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-
-import java.util.List;
 
 /**
 * @author Wongbuer
@@ -23,8 +17,6 @@ import java.util.List;
 */
 @Service
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements EmployeeService{
-    @Resource
-    private EmployeeServiceService employeeServiceService;
     @Override
     public Result<?> bindingEmployeeInfo(Employee employee) {
         // 从登录信息中获取userId
@@ -39,30 +31,6 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         employee.setUserId(userId);
         return save(employee) ? Result.success("添加员工成功") : Result.fail(40000, "添加员工失败");
     }
-
-    @Override
-    public Result<?> publishService(EmployeeServiceDTO employeeServiceDTO) {
-        long employeeId = getEmployeeId();
-        employeeServiceDTO.setEmployeeId(employeeId);
-        // 添加员工服务
-        return employeeServiceService.addEmployeeService(employeeServiceDTO) ? Result.success("添加员工服务成功") : Result.fail(40000, "添加员工服务失败");
-    }
-
-    @Override
-    public Result<?> deleteService(Long employeeServiceId) {
-        Assert.notNull(employeeServiceId);
-        long employeeId = getEmployeeId();
-        return employeeServiceService.deleteService(employeeId, employeeServiceId) ? Result.success("删除员工服务成功") : Result.fail(40000, "删除员工服务失败");
-    }
-
-    @Override
-    public Result<List<com.wong.reservation.domain.entity.EmployeeService>> getServiceList() {
-        long employeeId = getEmployeeId();
-        LambdaQueryWrapper<com.wong.reservation.domain.entity.EmployeeService> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(com.wong.reservation.domain.entity.EmployeeService::getEmployeeId, employeeId);
-        return Result.success(employeeServiceService.list(wrapper));
-    }
-
 
     @Override
     public Long getEmployeeId() {

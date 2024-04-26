@@ -3,6 +3,7 @@ package com.wong.reservation.service;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Service;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Wongbuer
@@ -14,9 +15,10 @@ public interface ServiceService extends IService<Service> {
      * 添加服务类型
      *
      * @param service 服务类型
+     * @param icon
      * @return Result<?> 添加结果
      */
-    Result<?> addService(Service service);
+    Result<?> addService(Service service, MultipartFile icon);
 
     /**
      * 修改服务类型

@@ -5,10 +5,8 @@ import com.wong.reservation.domain.entity.Service;
 import com.wong.reservation.service.ServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -41,8 +39,8 @@ public class ServiceController {
      */
     @Operation(summary = "添加服务类型")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result<?> addService(@RequestBody Service service) {
-        return serviceService.addService(service);
+    public Result<?> addService(@ModelAttribute Service service, MultipartFile icon) {
+        return serviceService.addService(service, icon);
     }
 
     /**

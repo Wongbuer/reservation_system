@@ -36,6 +36,11 @@ public class Service implements Serializable {
     @TableField(value = "description")
     private String description;
     /**
+     * 服务图标
+     */
+    @TableField(value = "icon_url")
+    private String iconUrl;
+    /**
      * 创建时间
      */
     @TableField(value = "created_at")

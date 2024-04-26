@@ -49,6 +49,7 @@
             <id property="id" column="sid" jdbcType="BIGINT"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
             <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="iconUrl" column="icon_url" jdbcType="VARCHAR"/>
             <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
             <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
         </association>
@@ -82,16 +83,18 @@
                discount,
                es.rate,
                description,
-               detailed_pictures
+               detailed_pictures,
+                icon_url
     </sql>
 
     <select id="selectRecommendServiceList" resultMap="recommendServiceMap">
-        select <include refid="recommendEmployeeServiceColumnList"/>
+        select
+        <include refid="recommendEmployeeServiceColumnList"/>
         from reservation_system.employee_service es
-                 join reservation_system.service s on s.id = es.service_id
-                 join reservation_system.employee e on e.id = es.employee_id
-                 join reservation_system.user u on u.id = e.user_id
-                 join reservation_system.orders o on e.id = o.employee_id
+        join reservation_system.service s on s.id = es.service_id
+        join reservation_system.employee e on e.id = es.employee_id
+        join reservation_system.user u on u.id = e.user_id
+        join reservation_system.orders o on e.id = o.employee_id
         where o.status = 8
         order by o.end_time desc
         limit 10;

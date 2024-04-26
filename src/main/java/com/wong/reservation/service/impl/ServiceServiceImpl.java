@@ -3,8 +3,12 @@ package com.wong.reservation.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Service;
-import com.wong.reservation.service.ServiceService;
 import com.wong.reservation.mapper.ServiceMapper;
+import com.wong.reservation.service.ServiceService;
+import jakarta.annotation.Resource;
+import org.dromara.x.file.storage.core.FileInfo;
+import org.dromara.x.file.storage.core.FileStorageService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
 * @author Wongbuer
@@ -14,10 +18,17 @@ import com.wong.reservation.mapper.ServiceMapper;
 @org.springframework.stereotype.Service
 public class ServiceServiceImpl extends ServiceImpl<ServiceMapper, Service> implements ServiceService{
 
+    @Resource
+    private FileStorageService fileStorageService;
+
     @Override
-    public Result<?> addService(Service service) {
+    public Result<?> addService(Service service, MultipartFile icon) {
         boolean isSaved;
         try {
+            FileInfo fileInfo = fileStorageService.of(icon).upload();
+            if (fileInfo != null) {
+                service.setIconUrl(fileInfo.getUrl());
+            }
             isSaved = save(service);
         } catch (Exception e) {
             return Result.fail("添加服务类型失败");

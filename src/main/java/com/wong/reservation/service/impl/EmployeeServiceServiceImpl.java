@@ -10,8 +10,13 @@ import com.wong.reservation.mapper.EmployeeServiceMapper;
 import com.wong.reservation.mapper.OrderMapper;
 import com.wong.reservation.service.EmployeeServiceService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.dromara.x.file.storage.core.FileInfo;
+import org.dromara.x.file.storage.core.FileStorageService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,13 +24,15 @@ import java.util.List;
  * @description 针对表【employee_service】的数据库操作Service实现
  * @createDate 2024-04-17 17:18:21
  */
+@Slf4j
 @Service
 public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMapper, EmployeeService> implements EmployeeServiceService {
-
     @Resource
     private OrderMapper orderMapper;
     @Resource
     private com.wong.reservation.service.EmployeeService employeeService;
+    @Resource
+    private FileStorageService fileStorageService;
 
     private boolean addEmployeeService(EmployeeServiceDTO employeeServiceDTO) {
         EmployeeService employeeService = new EmployeeService();
@@ -41,6 +48,23 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
         if (count(wrapper) > 0) {
             return false;
         }
+
+        List<String> urlList = new ArrayList<>(employeeServiceDTO.getDetailedPictures().size());
+        // 上传图片, 获取url
+        if (!CollectionUtils.isEmpty(employeeServiceDTO.getDetailedPictures())) {
+            employeeServiceDTO.getDetailedPictures().forEach(pic -> {
+                FileInfo fileInfo = fileStorageService.of(pic).upload();
+                if (fileInfo != null) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("上传图片成功, url: {}", fileInfo.getUrl());
+                    }
+                    urlList.add(fileInfo.getUrl());
+                }
+            });
+            String pics = String.join(",", urlList);
+            employeeService.setDetailedPictures(pics);
+        }
+
         boolean isSaved;
         try {
             isSaved = save(employeeService);

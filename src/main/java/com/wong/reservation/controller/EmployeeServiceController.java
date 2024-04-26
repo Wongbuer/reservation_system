@@ -2,7 +2,7 @@ package com.wong.reservation.controller;
 
 import com.wong.reservation.domain.dto.EmployeeServiceDTO;
 import com.wong.reservation.domain.dto.Result;
-import com.wong.reservation.domain.vo.RecommendServiceVO;
+import com.wong.reservation.domain.vo.EmployeeServiceVO;
 import com.wong.reservation.service.EmployeeServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
@@ -27,8 +27,20 @@ public class EmployeeServiceController {
      */
     @GetMapping("/recommend")
     @Operation(summary = "获取推荐服务")
-    public Result<List<RecommendServiceVO>> getRecommendServiceList() {
+    public Result<List<EmployeeServiceVO>> getRecommendServiceList() {
         return employeeServiceService.getRecommendServiceList();
+    }
+
+    /**
+     * 根据服务类别Id获取该类别的员工服务
+     *
+     * @param serviceId 服务类别id
+     * @return Result<List<EmployeeServiceVO>> 员工服务列表
+     */
+    @Operation(summary = "根据服务类别Id获取该类别的员工服务")
+    @GetMapping("/list/{serviceId}")
+    public Result<List<EmployeeServiceVO>> getServiceListByServiceId(@PathVariable("serviceId") Long serviceId, Integer current, Integer size) {
+        return employeeServiceService.getServiceListByServiceId(serviceId, current, size);
     }
 
     /**

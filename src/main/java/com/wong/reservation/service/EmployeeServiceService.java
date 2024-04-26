@@ -1,7 +1,7 @@
 package com.wong.reservation.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.wong.reservation.domain.vo.RecommendServiceVO;
+import com.wong.reservation.domain.vo.EmployeeServiceVO;
 import com.wong.reservation.domain.dto.EmployeeServiceDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.EmployeeService;
@@ -28,7 +28,7 @@ public interface EmployeeServiceService extends IService<EmployeeService> {
      *
      * @return Result<List<EmployeeService>>
      */
-    Result<List<RecommendServiceVO>> getRecommendServiceList();
+    Result<List<EmployeeServiceVO>> getRecommendServiceList();
 
     /**
      * 发布服务
@@ -44,4 +44,12 @@ public interface EmployeeServiceService extends IService<EmployeeService> {
      * @return Result<List<com.wong.reservation.domain.entity.EmployeeService>> 服务列表
      */
     Result<List<EmployeeService>> getServiceList();
+
+    /**
+     * 根据服务类别Id获取该类别的员工服务
+     *
+     * @param serviceId 服务类别id
+     * @return Result<List<EmployeeServiceVO>> 员工服务列表
+     */
+    Result<List<EmployeeServiceVO>> getServiceListByServiceId(Long serviceId, Integer current, Integer size);
 }

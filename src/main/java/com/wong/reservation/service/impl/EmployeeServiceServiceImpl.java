@@ -1,11 +1,12 @@
 package com.wong.reservation.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wong.reservation.domain.dto.EmployeeServiceDTO;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.EmployeeService;
-import com.wong.reservation.domain.vo.RecommendServiceVO;
+import com.wong.reservation.domain.vo.EmployeeServiceVO;
 import com.wong.reservation.mapper.EmployeeServiceMapper;
 import com.wong.reservation.mapper.OrderMapper;
 import com.wong.reservation.service.EmployeeServiceService;
@@ -92,7 +93,7 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
     }
 
     @Override
-    public Result<List<RecommendServiceVO>> getRecommendServiceList() {
+    public Result<List<EmployeeServiceVO>> getRecommendServiceList() {
         return Result.success(baseMapper.selectRecommendServiceList());
     }
 
@@ -109,6 +110,13 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
         LambdaQueryWrapper<com.wong.reservation.domain.entity.EmployeeService> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(com.wong.reservation.domain.entity.EmployeeService::getEmployeeId, employeeId);
         return Result.success(list(wrapper));
+    }
+
+    @Override
+    public Result<List<EmployeeServiceVO>> getServiceListByServiceId(Long serviceId, Integer current, Integer size) {
+        Page<EmployeeService> page = new Page<>(current, size);
+        List<EmployeeServiceVO> list = baseMapper.selectEmployeeServiceByServiceId(page, serviceId);
+        return Result.success(list);
     }
 }
 

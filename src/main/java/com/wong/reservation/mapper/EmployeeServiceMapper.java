@@ -1,8 +1,10 @@
 package com.wong.reservation.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.wong.reservation.domain.entity.EmployeeService;
-import com.wong.reservation.domain.vo.RecommendServiceVO;
+import com.wong.reservation.domain.vo.EmployeeServiceVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -13,7 +15,8 @@ import java.util.List;
 * @Entity com.wong.reservation.domain.entity.EmployeeService
 */
 public interface EmployeeServiceMapper extends BaseMapper<EmployeeService> {
-    List<RecommendServiceVO> selectRecommendServiceList();
+    List<EmployeeServiceVO> selectRecommendServiceList();
+    List<EmployeeServiceVO> selectEmployeeServiceByServiceId(IPage<?> page,@Param("serviceId") Long serviceId);
 }
 
 

@@ -17,7 +17,7 @@
         <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <resultMap id="recommendServiceMap" type="com.wong.reservation.domain.vo.RecommendServiceVO">
+    <resultMap id="recommendServiceMap" type="com.wong.reservation.domain.vo.EmployeeServiceVO">
         <id property="id" column="esid" jdbcType="BIGINT"/>
         <result property="rate" column="rate" jdbcType="INTEGER"/>
         <result property="price" column="price" jdbcType="DECIMAL"/>
@@ -60,8 +60,8 @@
         updated_at
     </sql>
 
-    <select id="selectRecommendServiceList" resultMap="recommendServiceMap">
-        select u.id  uid,
+    <sql id="recommendEmployeeServiceColumnList">
+        u.id  uid,
                username,
                password,
                nickname,
@@ -83,6 +83,10 @@
                es.rate,
                description,
                detailed_pictures
+    </sql>
+
+    <select id="selectRecommendServiceList" resultMap="recommendServiceMap">
+        select <include refid="recommendEmployeeServiceColumnList"/>
         from reservation_system.employee_service es
                  join reservation_system.service s on s.id = es.service_id
                  join reservation_system.employee e on e.id = es.employee_id
@@ -91,5 +95,35 @@
         where o.status = 8
         order by o.end_time desc
         limit 10;
+    </select>
+
+    <select id="selectEmployeeServiceByServiceId" resultMap="recommendServiceMap">
+        select u.id  uid,
+               username,
+               password,
+               nickname,
+               gender,
+               avatar,
+               email,
+               phone,
+               default_address_id,
+               e.id  eid,
+               user_id,
+               score,
+               es.id esid,
+               employee_id,
+               service_id,
+               price,
+               time_uint,
+               name,
+               discount,
+               es.rate,
+               description,
+               detailed_pictures
+        from reservation_system.employee_service es
+                 join reservation_system.employee e on e.id = es.employee_id
+                 join reservation_system.user u on u.id = e.user_id
+                 join reservation_system.service s on s.id = es.service_id
+        where service_id = #{serviceId}
     </select>
 </mapper>

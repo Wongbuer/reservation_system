@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RecommendServiceVO {
+public class EmployeeServiceVO {
     private Long id;
     private Employee employee;
     private User user;

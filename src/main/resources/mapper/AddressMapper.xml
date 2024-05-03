@@ -5,27 +5,29 @@
 <mapper namespace="com.wong.reservation.mapper.AddressMapper">
 
     <resultMap id="BaseResultMap" type="com.wong.reservation.domain.entity.Address">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="name" column="name" jdbcType="VARCHAR"/>
-            <result property="phone" column="phone" jdbcType="VARCHAR"/>
-            <result property="province" column="province" jdbcType="VARCHAR"/>
-            <result property="city" column="city" jdbcType="VARCHAR"/>
-            <result property="district" column="district" jdbcType="VARCHAR"/>
-            <result property="fullAddress" column="full_address" jdbcType="VARCHAR"/>
-            <result property="postalCode" column="postal_code" jdbcType="VARCHAR"/>
-            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
-            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+        <result property="province" column="province" jdbcType="VARCHAR"/>
+        <result property="city" column="city" jdbcType="VARCHAR"/>
+        <result property="district" column="district" jdbcType="VARCHAR"/>
+        <result property="fullAddress" column="full_address" jdbcType="VARCHAR"/>
+        <result property="postalCode" column="postal_code" jdbcType="VARCHAR"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+        <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,name,phone,
+        id,name,phone,user_id,
         province,city,district,
         full_address,postal_code,created_at,
         updated_at
     </sql>
 
     <select id="selectAddressListByUserId" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/>
+        select
+        <include refid="Base_Column_List"/>
         from reservation_system.address
         where user_id = #{userId}
     </select>

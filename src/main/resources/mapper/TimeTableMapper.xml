@@ -20,8 +20,8 @@
                         nsie.new_end   AS end_time
         FROM (SELECT #{reservationTime} AS new_start,
                      CASE
-                         WHEN time_uint = 'hour' THEN DATE_ADD(#{reservationTime}, INTERVAL 3 HOUR)
-                         WHEN time_uint = 'minute' THEN DATE_ADD(#{reservationTime}, INTERVAL 3 MINUTE)
+                         WHEN time_unit = 'hour' THEN DATE_ADD(#{reservationTime}, INTERVAL #{unitCount} HOUR)
+                         WHEN time_unit = 'minutes' THEN DATE_ADD(#{reservationTime}, INTERVAL #{unitCount} MINUTE)
                          END            AS new_end
               FROM reservation_system.employee_service es
               WHERE employee_id = #{employeeId}

@@ -11,7 +11,6 @@ import com.wong.reservation.domain.entity.Address;
 import com.wong.reservation.mapper.AddressMapper;
 import com.wong.reservation.service.AddressService;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -35,7 +34,9 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
     @Override
     public Result<?> addAddress(AddressDTO addressDTO) {
         try {
+            long userId = StpUtil.getLoginIdAsLong();
             Address address = BeanUtil.toBean(addressDTO, Address.class);
+            address.setUserId(userId);
             boolean isSaved = save(address);
             Assert.isTrue(isSaved, "添加地址失败");
             return Result.success("添加地址成功");

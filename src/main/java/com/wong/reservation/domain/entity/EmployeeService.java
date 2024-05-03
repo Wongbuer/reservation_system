@@ -48,6 +48,11 @@ public class EmployeeService implements Serializable {
     @TableField(value = "price")
     private BigDecimal price;
     /**
+     * 员工服务描述
+     */
+    @TableField(value = "description")
+    private String description;
+    /**
      * 员工服务折扣
      */
      @TableField(value = "discount")
@@ -55,8 +60,8 @@ public class EmployeeService implements Serializable {
     /**
      * 员工服务计价单位
      */
-    @TableField(value = "time_uint")
-    private String timeUint;
+    @TableField(value = "time_unit")
+    private String timeUnit;
     /**
      * 创建时间
      */

@@ -40,7 +40,7 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
         employeeService.setEmployeeId(employeeServiceDTO.getEmployeeId());
         employeeService.setServiceId(employeeServiceDTO.getServiceId());
         employeeService.setPrice(employeeServiceDTO.getPrice());
-        employeeService.setTimeUint(employeeServiceDTO.getTimeUint());
+        employeeService.setTimeUnit(employeeServiceDTO.getTimeUnit());
 
         // 查询有无重复数据
         LambdaQueryWrapper<EmployeeService> wrapper = new LambdaQueryWrapper<>();
@@ -114,7 +114,14 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
 
     @Override
     public Result<List<EmployeeServiceVO>> getServiceListByServiceId(Long serviceId, Integer current, Integer size) {
-        Page<EmployeeService> page = new Page<>(current, size);
+        Page<EmployeeService> page = null;
+        try {
+            page = new Page<>(current, size);
+        } catch (Exception e) {
+            if (log.isTraceEnabled()) {
+                log.trace("未开启分页, 默认全量查询");
+            }
+        }
         List<EmployeeServiceVO> list = baseMapper.selectEmployeeServiceByServiceId(page, serviceId);
         return Result.success(list);
     }

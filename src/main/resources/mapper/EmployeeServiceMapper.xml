@@ -10,8 +10,9 @@
         <result property="serviceId" column="service_id" jdbcType="BIGINT"/>
         <result property="rate" column="rate" jdbcType="INTEGER"/>
         <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
         <result property="discount" column="discount" jdbcType="DECIMAL"/>
-        <result property="timeUint" column="time_uint" jdbcType="VARCHAR"/>
+        <result property="timeUnit" column="time_unit" jdbcType="VARCHAR"/>
         <result property="detailedPictures" column="detailed_pictures" jdbcType="VARCHAR"/>
         <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
         <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
@@ -21,8 +22,9 @@
         <id property="id" column="esid" jdbcType="BIGINT"/>
         <result property="rate" column="rate" jdbcType="INTEGER"/>
         <result property="price" column="price" jdbcType="DECIMAL"/>
+        <result property="description" column="esdescription" jdbcType="VARCHAR"/>
         <result property="discount" column="discount" jdbcType="DECIMAL"/>
-        <result property="timeUint" column="time_uint" jdbcType="VARCHAR"/>
+        <result property="timeUnit" column="time_unit" jdbcType="VARCHAR"/>
         <result property="detailedPictures" column="detailed_pictures" jdbcType="VARCHAR"/>
         <association property="employee" javaType="com.wong.reservation.domain.entity.Employee">
             <id property="id" column="eid" jdbcType="BIGINT"/>
@@ -48,7 +50,7 @@
         <association property="service" javaType="com.wong.reservation.domain.entity.Service">
             <id property="id" column="sid" jdbcType="BIGINT"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
-            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="description" column="sdescription" jdbcType="VARCHAR"/>
             <result property="iconUrl" column="icon_url" jdbcType="VARCHAR"/>
             <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
             <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
@@ -57,7 +59,7 @@
 
     <sql id="Base_Column_List">
         id,employee_id,service_id,
-        price,time_uint,created_at,
+        price,time_unit,created_at,
         updated_at
     </sql>
 
@@ -78,13 +80,14 @@
                o.employee_id,
                o.service_id,
                price,
-               time_uint,
+               time_unit,
                name,
                discount,
                es.rate,
-               description,
                detailed_pictures,
-                icon_url
+                icon_url,
+        es.description esdescription,
+        s.description sdescription
     </sql>
 
     <select id="selectRecommendServiceList" resultMap="recommendServiceMap">
@@ -117,11 +120,12 @@
                employee_id,
                service_id,
                price,
-               time_uint,
+               time_unit,
                name,
                discount,
                es.rate,
-               description,
+               es.description esdescription,
+               s.description sdescription,
                detailed_pictures
         from reservation_system.employee_service es
                  join reservation_system.employee e on e.id = es.employee_id

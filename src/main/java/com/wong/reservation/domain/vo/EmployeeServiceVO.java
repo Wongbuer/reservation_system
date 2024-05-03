@@ -21,7 +21,8 @@ public class EmployeeServiceVO {
     private Service service;
     private Integer rate;
     private BigDecimal price;
+    private String description;
     private BigDecimal discount;
-    private String timeUint;
+    private String timeUnit;
     private String detailedPictures;
 }

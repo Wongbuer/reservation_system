@@ -57,8 +57,9 @@ dromara:
         access-key: irQN7435V6SMIB-MqH24DJEFhwj-vwPsD74z05gh
         secret-key: U4lzab5eLy34ZB5K3U-40SLtS3Eo7pU4c2axMG6N
         bucket-name: wongbuer-reservation-system
-        domain: http://sb92bqshe.hn-bkt.clouddn.com/
+        domain: http://sck613b3h.hn-bkt.clouddn.com/
         base-path: detailed_pic/ # 基础路径
+
 logging:
   level:
     com.wong.reservation: trace

@@ -14,6 +14,7 @@ import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Evaluation;
 import com.wong.reservation.domain.entity.Order;
 import com.wong.reservation.domain.entity.TimeTable;
+import com.wong.reservation.mapper.EmployeeServiceMapper;
 import com.wong.reservation.mapper.OrderMapper;
 import com.wong.reservation.service.*;
 import com.wong.reservation.utils.RedisUtils;
@@ -67,6 +68,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Resource
     private AliPayService aliPayService;
     @Resource
+    private EmployeeServiceMapper employeeServiceMapper;
+    @Resource
     private Snowflake snowflake;
     @Resource
     private PlatformTransactionManager transactionManager;
@@ -100,6 +103,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setUserId(userId);
         // 根据雪花算法生成orderId
         order.setId(snowflake.nextId());
+
+        // 如果存在employeeServiceId, 则补全其他信息
+        if (!ObjectUtils.isEmpty(order.getEmployeeServiceId())) {
+            com.wong.reservation.domain.entity.EmployeeService info = employeeServiceMapper.selectById(order.getEmployeeServiceId());
+            if (info != null) {
+                order.setEmployeeId(info.getEmployeeId());
+                order.setServiceId(info.getServiceId());
+            }
+        }
 
         // 判断order是否含有必要参数(地址ID是否存在/服务ID是否存在/用户ID是否存在/员工ID是否存在/时间是否合法)
         int validCode = isOrderInfoValid(order);
@@ -156,7 +168,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             } finally {
                 orderLock.releaseLock(lockKey);
             }
-            return Result.success("添加订单成功");
+            return Result.success("添加订单成功", order);
         } else {
             return Result.fail("订单创建失败, 请稍后再试");
         }
@@ -250,6 +262,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (isLocked) {
             try {
                 // 获取订单
+                id = 1784291607348543488L;
                 Order order = getById(id);
                 if (ObjectUtils.isEmpty(order)) {
                     Result.fail(40000, "订单不存在", response);

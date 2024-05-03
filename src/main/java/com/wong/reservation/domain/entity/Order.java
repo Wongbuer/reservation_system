@@ -121,4 +121,9 @@ public class Order implements Serializable {
     @TableField(value = "updated_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+    /**
+     * 员工服务表主键
+     */
+    @TableField(exist = false)
+    private Long employeeServiceId;
 }

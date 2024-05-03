@@ -21,8 +21,8 @@ public class EmployeeServiceDTO {
     private Long serviceId;
     @Schema(title = "服务价格", name = "price", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private BigDecimal price;
-    @Schema(title = "服务时间单位", name = "timeUint", example = "hour", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String timeUint;
+    @Schema(title = "服务时间单位", name = "timeUnit", example = "hour", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String timeUnit;
     @Schema(title = "服务详细介绍", name = "detailedPictures", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<MultipartFile> detailedPictures;
 }

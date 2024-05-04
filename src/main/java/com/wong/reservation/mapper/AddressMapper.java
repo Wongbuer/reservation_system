@@ -3,6 +3,7 @@ package com.wong.reservation.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wong.reservation.domain.entity.Address;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  */
 public interface AddressMapper extends BaseMapper<Address> {
     List<Address> selectAddressListByUserId(Long userId);
+    Boolean setDefaultAddress(@Param("id") Long id, @Param("userId") Long userId);
 }
 
 

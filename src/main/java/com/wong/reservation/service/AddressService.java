@@ -44,4 +44,12 @@ public interface AddressService extends IService<Address> {
      * @return Result<?> 删除结果
      */
     Result<?> deleteAddress(Long id);
+
+    /**
+     * 设置默认地址
+     *
+     * @param id 地址ID
+     * @return Result<?> 设置结果
+     */
+    Result<?> setDefaultAddress(Long id);
 }

@@ -69,6 +69,13 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address> impl
         }
         return isDeleted ? Result.success("删除成功") : Result.fail("删除失败");
     }
+
+    @Override
+    public Result<?> setDefaultAddress(Long id) {
+        long userId = StpUtil.getLoginIdAsLong();
+        Boolean isUpdated = baseMapper.setDefaultAddress(id, userId);
+        return isUpdated ? Result.success("设置默认地址成功") : Result.fail("设置默认地址失败");
+    }
 }
 
 

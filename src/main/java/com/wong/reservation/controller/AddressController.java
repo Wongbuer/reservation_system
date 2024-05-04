@@ -66,4 +66,16 @@ public class AddressController {
     public Result<?> deleteAddress(Long id) {
         return addressService.deleteAddress(id);
     }
+
+    /**
+     * 设置默认地址
+     *
+     * @param id 地址ID
+     * @return Result<?> 设置结果
+     */
+    @Operation(summary = "设置默认地址")
+    @RequestMapping(value = "/setDefault", method = RequestMethod.GET)
+    public Result<?> setDefaultAddress(Long id) {
+        return addressService.setDefaultAddress(id);
+    }
 }

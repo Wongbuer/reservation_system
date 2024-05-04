@@ -24,6 +24,11 @@
         full_address,postal_code,created_at,
         updated_at
     </sql>
+    <update id="setDefaultAddress">
+        update reservation_system.user
+        set default_address_id = #{id}
+        where #{id} in (select id from reservation_system.address where user_id = #{userId})
+    </update>
 
     <select id="selectAddressListByUserId" resultMap="BaseResultMap">
         select

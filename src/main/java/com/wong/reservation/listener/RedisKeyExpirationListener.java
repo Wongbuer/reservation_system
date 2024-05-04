@@ -1,9 +1,12 @@
 package com.wong.reservation.listener;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.wong.reservation.constant.OrderStatusConstant;
 import com.wong.reservation.domain.entity.Order;
+import com.wong.reservation.domain.entity.TimeTable;
 import com.wong.reservation.service.OrderService;
+import com.wong.reservation.service.TimeTableService;
 import com.wong.reservation.utils.lock.OrderLock;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +29,8 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
     private OrderService orderService;
     @Resource
     private OrderLock orderLock;
+    @Resource
+    private TimeTableService timeTableService;
 
     public RedisKeyExpirationListener(RedisMessageListenerContainer listenerContainer) {
         super(listenerContainer);
@@ -65,7 +70,8 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
 
                 LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
                 wrapper.eq(Order::getId, orderId);
-
+                LambdaQueryWrapper<TimeTable> timeTableWrapper = new LambdaQueryWrapper<>();
+                timeTableWrapper.eq(TimeTable::getOrderId, orderId);
                 // 判断是否为CREATED
                 if (order.getStatus() == OrderStatusConstant.CREATED) {
                     wrapper
@@ -73,21 +79,21 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                             .eq(Order::getStatus, OrderStatusConstant.CREATED)
                             // 修改订单状态
                             .set(Order::getStatus, OrderStatusConstant.TIMEOUT_CREATED);
-                    updateOrderStatus(wrapper);
+                    timeoutDatabaseOperation(wrapper, timeTableWrapper);
                 } else if (order.getStatus() == OrderStatusConstant.ACCEPTED) {
                     wrapper
                             // 再次确认订单状态正确
                             .eq(Order::getStatus, OrderStatusConstant.ACCEPTED)
                             // 修改订单状态
                             .set(Order::getStatus, OrderStatusConstant.TIMEOUT_PAYMENT);
-                    updateOrderStatus(wrapper);
+                    timeoutDatabaseOperation(wrapper, timeTableWrapper);
                 } else if (order.getStatus() == OrderStatusConstant.NOT_EVALUATED) {
                     wrapper
                             // 再次确认订单状态正确
                             .eq(Order::getStatus, OrderStatusConstant.NOT_EVALUATED)
                             // 修改订单状态
                             .set(Order::getStatus, OrderStatusConstant.TIMEOUT_EVALUATED);
-                    updateOrderStatus(wrapper);
+                    timeoutDatabaseOperation(wrapper, timeTableWrapper);
                 } else {
                     log.info("订单状态已变化, 已经为: {}", OrderStatusConstant.getStatusName(order.getStatus()));
                 }
@@ -101,10 +107,11 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
         }
     }
 
-    private void updateOrderStatus(LambdaUpdateWrapper<Order> wrapper) {
+    private void timeoutDatabaseOperation(LambdaUpdateWrapper<Order> orderWrapper, LambdaQueryWrapper<TimeTable> timeTableWrapper) {
         try {
-            boolean isUpdated = orderService.update(wrapper);
-            if (!isUpdated) {
+            boolean isUpdated = orderService.update(orderWrapper);
+            boolean isRemoved = timeTableService.remove(timeTableWrapper);
+            if (!isUpdated || !isRemoved) {
                 log.info("订单状态已变化");
             } else {
                 log.info("订单状态修改成功");

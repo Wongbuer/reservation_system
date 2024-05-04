@@ -31,6 +31,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -77,11 +78,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     public Result<List<Order>> getOrderByUserId(String status, Boolean sort) {
         // 根据登录信息获取userId
-        Long userId = (Long) StpUtil.getLoginId();
+        Long userId = StpUtil.getLoginIdAsLong();
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
         // 查询当前用户对应status下的所有订单, 如果status为null则为所有status的订单
         wrapper.eq(Order::getUserId, userId)
-                .eq(status != null, Order::getStatus, status)
+                .eq(StringUtils.hasText(status), Order::getStatus, status)
                 // 未被删除的订单
                 .eq(Order::getIsDeleted, 0)
                 .orderByDesc(sort, Order::getCreatedAt);

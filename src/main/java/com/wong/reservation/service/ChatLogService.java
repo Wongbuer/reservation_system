@@ -3,6 +3,7 @@ package com.wong.reservation.service;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.ChatLog;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.wong.reservation.domain.entity.User;
 
 import java.util.List;
 
@@ -27,4 +28,11 @@ public interface ChatLogService extends IService<ChatLog> {
      * @return 设置结果
      */
     Result<?> setRead(List<Long> chatLogIdList);
+
+    /**
+     * 获取聊天用户列表
+     *
+     * @return 聊天用户列表
+     */
+    Result<List<User>> getChatUserList();
 }

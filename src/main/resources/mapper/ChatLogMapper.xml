@@ -19,4 +19,16 @@
         content,status,created_at,
         updated_at
     </sql>
+
+    <select id="selectChatUserList" resultType="com.wong.reservation.domain.entity.User">
+        select *
+        from reservation_system.user
+                 left join reservation_system.employee e on user.id = e.user_id
+        where user.id in (select user.id
+                          from reservation_system.chat_log
+                                   join reservation_system.user
+                                        on chat_log.receiver_id = user.id or chat_log.sender_id = user.id
+                          where user.id != #{userId}
+                          group by user.id)
+    </select>
 </mapper>

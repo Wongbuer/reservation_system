@@ -78,4 +78,17 @@ public class AddressController {
     public Result<?> setDefaultAddress(Long id) {
         return addressService.setDefaultAddress(id);
     }
+
+    /**
+     * 根据地址ID获取地址信息
+     *
+     * @param id 地址ID
+     * @return Result<?> 获取结果
+     */
+    @Operation(summary = "根据地址ID获取地址信息")
+    @RequestMapping(value = "/getById", method = RequestMethod.GET)
+    public Result<Address> getAddressById(Long id) {
+        Address address = addressService.getById(id);
+        return address == null ? Result.fail("地址不存在") : Result.success(address);
+    }
 }

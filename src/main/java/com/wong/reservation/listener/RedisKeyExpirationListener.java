@@ -16,6 +16,8 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDateTime;
+
 import static com.wong.reservation.constant.SystemConstant.*;
 
 /**
@@ -69,7 +71,9 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                 }
 
                 LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
-                wrapper.eq(Order::getId, orderId);
+                wrapper
+                        .eq(Order::getId, orderId)
+                        .set(Order::getCloseTime, LocalDateTime.now());
                 LambdaQueryWrapper<TimeTable> timeTableWrapper = new LambdaQueryWrapper<>();
                 timeTableWrapper.eq(TimeTable::getOrderId, orderId);
                 // 判断是否为CREATED

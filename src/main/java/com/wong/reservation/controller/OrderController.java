@@ -1,5 +1,7 @@
 package com.wong.reservation.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.wong.reservation.constant.OrderStatusConstant;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Evaluation;
 import com.wong.reservation.domain.entity.Order;
@@ -70,6 +72,36 @@ public class OrderController {
     @RequestMapping(value = "/pay", method = RequestMethod.GET)
     public void payOrder(Long id, HttpServletResponse response) {
         orderService.payOrder(id, response);
+    }
+
+    /**
+     * 支付订单(不做任何校验, 发送即支付成功)
+     *
+     * @param id 订单ID
+     */
+    @Operation(summary = "支付订单(不做任何校验, 发送即支付成功)")
+    @RequestMapping(value = "/payJustById", method = RequestMethod.GET)
+    public Result<?> payOrderJustById(Long id) {
+        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+        wrapper
+                .eq(Order::getId, id)
+                .set(Order::getStatus, OrderStatusConstant.PAID);
+        return orderService.update(wrapper) ? Result.success("支付成功") : Result.fail("支付失败");
+    }
+
+    /**
+     * 退款订单(不做任何校验, 发送即退款成功)
+     *
+     * @param id 订单ID
+     */
+    @Operation(summary = "退款订单(不做任何校验, 发送即退款成功)")
+    @RequestMapping(value = "/refundOrderJustById", method = RequestMethod.GET)
+    public Result<?> refundOrderJustById(Long id) {
+        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+        wrapper
+                .eq(Order::getId, id)
+                .set(Order::getStatus, OrderStatusConstant.REFUNDED);
+        return orderService.update(wrapper) ? Result.success("退款成功") : Result.fail("退款失败");
     }
 
     /**

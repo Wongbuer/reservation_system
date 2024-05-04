@@ -125,6 +125,15 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
         List<EmployeeServiceVO> list = baseMapper.selectEmployeeServiceByServiceId(page, serviceId);
         return Result.success(list);
     }
+
+    @Override
+    public Result<EmployeeService> getEmployeeServiceByEmployeeIdAndServiceId(Long employeeId, Long serviceId) {
+        LambdaQueryWrapper<EmployeeService> wrapper = new LambdaQueryWrapper<>();
+        wrapper
+                .eq(EmployeeService::getEmployeeId, employeeId)
+                .eq(EmployeeService::getServiceId, serviceId);
+        return Result.success(getOne(wrapper));
+    }
 }
 
 

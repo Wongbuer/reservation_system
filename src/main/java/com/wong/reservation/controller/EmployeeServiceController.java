@@ -2,6 +2,7 @@ package com.wong.reservation.controller;
 
 import com.wong.reservation.domain.dto.EmployeeServiceDTO;
 import com.wong.reservation.domain.dto.Result;
+import com.wong.reservation.domain.entity.EmployeeService;
 import com.wong.reservation.domain.vo.EmployeeServiceVO;
 import com.wong.reservation.service.EmployeeServiceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,5 +77,18 @@ public class EmployeeServiceController {
     @RequestMapping(value = "/service/delete", method = RequestMethod.GET)
     public  Result<?> deleteService(Long id) {
         return employeeServiceService.deleteService(id);
+    }
+
+    /**
+     * 根据员工ID和服务ID获取员工服务
+     *
+     * @param employeeId 员工ID
+     * @param serviceId  服务ID
+     * @return Result<EmployeeService> 员工服务
+     */
+    @Operation(summary = "根据员工ID和服务ID获取员工服务")
+    @RequestMapping(value = "/getByEmployeeIdAndServiceId", method = RequestMethod.GET)
+    public Result<EmployeeService> getEmployeeServiceByEmployeeIdAndServiceId(Long employeeId, Long serviceId) {
+        return employeeServiceService.getEmployeeServiceByEmployeeIdAndServiceId(employeeId, serviceId);
     }
 }

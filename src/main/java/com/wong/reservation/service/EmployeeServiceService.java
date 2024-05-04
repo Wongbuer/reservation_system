@@ -52,4 +52,13 @@ public interface EmployeeServiceService extends IService<EmployeeService> {
      * @return Result<List<EmployeeServiceVO>> 员工服务列表
      */
     Result<List<EmployeeServiceVO>> getServiceListByServiceId(Long serviceId, Integer current, Integer size);
+
+    /**
+     * 根据员工ID和服务ID获取员工服务
+     *
+     * @param employeeId 员工ID
+     * @param serviceId  服务ID
+     * @return Result<EmployeeService> 员工服务
+     */
+    Result<EmployeeService> getEmployeeServiceByEmployeeIdAndServiceId(Long employeeId, Long serviceId);
 }

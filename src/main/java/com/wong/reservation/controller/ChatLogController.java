@@ -2,6 +2,7 @@ package com.wong.reservation.controller;
 
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.ChatLog;
+import com.wong.reservation.domain.entity.User;
 import com.wong.reservation.service.ChatLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
@@ -44,5 +45,16 @@ public class ChatLogController {
     @RequestMapping(value = "/read", method = RequestMethod.POST)
     public Result<?> setRead(List<Long> chatLogIdList) {
         return chatLogService.setRead(chatLogIdList);
+    }
+
+    /**
+     * 获取聊天用户列表
+     *
+     * @return 聊天用户列表
+     */
+    @Operation(summary = "获取聊天用户列表")
+    @RequestMapping(value = "/user/list", method = RequestMethod.GET)
+    public Result<List<User>> getChatUserList() {
+        return chatLogService.getChatUserList();
     }
 }

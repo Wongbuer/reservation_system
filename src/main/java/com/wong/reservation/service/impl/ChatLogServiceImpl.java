@@ -7,8 +7,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wong.reservation.constant.ChatLogStatusConstant;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.ChatLog;
-import com.wong.reservation.service.ChatLogService;
+import com.wong.reservation.domain.entity.User;
 import com.wong.reservation.mapper.ChatLogMapper;
+import com.wong.reservation.service.ChatLogService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,6 +49,18 @@ public class ChatLogServiceImpl extends ServiceImpl<ChatLogMapper, ChatLog> impl
             return Result.fail("设置已读失败");
         }
         return isUpdated ? Result.success("设置已读成功") : Result.fail("设置已读失败");
+    }
+
+    @Override
+    public Result<List<User>> getChatUserList() {
+        long userId = StpUtil.getLoginIdAsLong();
+        List<User> userList = null;
+        try {
+            userList = baseMapper.selectChatUserList(userId);
+        } catch (Exception e) {
+            return Result.fail("获取聊天用户列表失败");
+        }
+        return Result.success(userList);
     }
 }
 

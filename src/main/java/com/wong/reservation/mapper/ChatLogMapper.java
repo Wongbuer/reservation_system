@@ -1,7 +1,10 @@
 package com.wong.reservation.mapper;
 
-import com.wong.reservation.domain.entity.ChatLog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.wong.reservation.domain.entity.ChatLog;
+import com.wong.reservation.domain.entity.User;
+
+import java.util.List;
 
 /**
 * @author Wongbuer
@@ -10,7 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity com.wong.reservation.domain.entity.ChatLog
 */
 public interface ChatLogMapper extends BaseMapper<ChatLog> {
-
+    List<User> selectChatUserList(Long userId);
 }
 
 

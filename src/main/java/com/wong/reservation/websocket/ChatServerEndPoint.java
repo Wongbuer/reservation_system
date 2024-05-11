@@ -50,8 +50,12 @@ public class ChatServerEndPoint {
         }
         this.session = session;
         this.id = id;
+        ChatServerEndPoint olderConn = WEB_SOCKET_MAP.get(this.id);
+        if (olderConn != null) {
+            olderConn.session.close();
+        }
         WEB_SOCKET_MAP.put(this.id, this);
-        ONLINE_COUNT.getAndIncrement();
+        ONLINE_COUNT.set(WEB_SOCKET_MAP.size());
         try {
             sendMessage("conn_success");
             log.info("有新窗口开始监听:{},当前在线人数为:{}", this.id, ONLINE_COUNT.get());
@@ -85,6 +89,9 @@ public class ChatServerEndPoint {
             if (!isChatValid(chatLog)) {
                 sendMessage("信息格式有误");
                 return;
+            }
+            if (WEB_SOCKET_MAP.containsKey(chatLog.getReceiverId())) {
+                chatLog.setStatus(1);
             }
             // 保存信息
             chatLogService.save(chatLog);

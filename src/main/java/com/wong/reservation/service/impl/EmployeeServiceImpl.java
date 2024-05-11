@@ -43,6 +43,14 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         }
         return employee.getId();
     }
+
+    @Override
+    public Result<Employee> getEmployeeInfo() {
+        long userId = StpUtil.getLoginIdAsLong();
+        LambdaQueryWrapper<Employee> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Employee::getUserId, userId);
+        return getOne(wrapper) == null ? Result.fail(40000, "该用户未绑定员工") : Result.success(getOne(wrapper));
+    }
 }
 
 

@@ -52,7 +52,7 @@ public class EmployeeServiceController {
      */
     @PostMapping("/publish")
     @Operation(summary = "发布服务")
-    public Result<?> publishService(@ModelAttribute EmployeeServiceDTO employeeServiceDTO) {
+    public Result<?> publishService(@RequestBody EmployeeServiceDTO employeeServiceDTO) {
         return employeeServiceService.publishService(employeeServiceDTO);
     }
 

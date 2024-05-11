@@ -11,6 +11,7 @@ import com.wong.reservation.domain.entity.User;
  * @Entity com.wong.reservation.domain.entity.User
  */
 public interface UserMapper extends BaseMapper<User> {
+    User selectUserByEmployeeId(Long employeeId);
 }
 
 

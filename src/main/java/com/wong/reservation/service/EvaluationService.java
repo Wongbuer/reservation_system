@@ -18,4 +18,12 @@ public interface EvaluationService extends IService<Evaluation> {
      * @return 增加评价结果
      */
     Result<?> addEvaluation(Evaluation evaluation);
+
+    /**
+     * 根据订单ID获取评价信息
+     *
+     * @param orderId 订单ID
+     * @return Result<Evaluation> 订单评价
+     */
+    Result<Evaluation> getEvaluationByOrderId(Long orderId);
 }

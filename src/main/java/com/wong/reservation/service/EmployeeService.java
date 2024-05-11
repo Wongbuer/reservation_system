@@ -25,4 +25,11 @@ public interface EmployeeService extends IService<Employee> {
      * @return Long 员工id
      */
     Long getEmployeeId();
+
+    /**
+     * 获取员工信息
+     *
+     * @return Result<Employee> 员工信息
+     */
+    Result<Employee> getEmployeeInfo();
 }

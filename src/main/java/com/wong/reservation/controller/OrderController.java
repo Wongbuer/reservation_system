@@ -6,6 +6,7 @@ import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Evaluation;
 import com.wong.reservation.domain.entity.Order;
 import com.wong.reservation.service.OrderService;
+import com.wong.reservation.utils.RedisUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.wong.reservation.constant.SystemConstant.ORDER_EVALUATE_PREFIX;
 
 /**
  * @author Wongbuer
@@ -25,6 +29,8 @@ import java.util.List;
 public class OrderController {
     @Resource
     private OrderService orderService;
+    @Resource
+    private RedisUtils redisUtils;
 
     /**
      * 获取订单信息(默认以订单创建时间降序)
@@ -85,7 +91,8 @@ public class OrderController {
         LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
         wrapper
                 .eq(Order::getId, id)
-                .set(Order::getStatus, OrderStatusConstant.PAID);
+                .set(Order::getStatus, OrderStatusConstant.PAID)
+                .set(Order::getPaymentTime, LocalDateTime.now());
         return orderService.update(wrapper) ? Result.success("支付成功") : Result.fail("支付失败");
     }
 
@@ -164,5 +171,40 @@ public class OrderController {
         return orderService.deleteOrder(id);
     }
 
+    /**
+     * 开始订单(不做任何校验, 发送即开始成功)
+     *
+     * @param id 订单ID
+     */
+    @Operation(summary = "开始订单(不做任何校验, 发送即开始成功)")
+    @RequestMapping(value = "/startOrderJustById", method = RequestMethod.GET)
+    public Result<?> startOrderJustById(Long id) {
+        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+        wrapper
+                .eq(Order::getId, id)
+                .set(Order::getStatus, OrderStatusConstant.PENDING);
+        return orderService.update(wrapper) ? Result.success("订单开始") : Result.fail("订单开始失败");
+    }
 
+    /**
+     * 结束订单(不做任何校验, 发送即结束成功)
+     *
+     * @param id 订单ID
+     */
+    @Operation(summary = "结束订单(不做任何校验, 发送即结束成功)")
+    @RequestMapping(value = "/endOrderJustById", method = RequestMethod.GET)
+    public Result<?> endOrderJustById(Long id) {
+        LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
+        wrapper
+                .eq(Order::getId, id)
+                .set(Order::getStatus, OrderStatusConstant.NOT_EVALUATED);
+        Order order = new Order();
+        boolean isUpdated = orderService.update(order, wrapper);
+        if (isUpdated) {
+            redisUtils.set(ORDER_EVALUATE_PREFIX + id, order, 60 * 15);
+            return Result.success("订单服务完成");
+        } else {
+            return Result.fail("订单服务完成设置失败");
+        }
+    }
 }

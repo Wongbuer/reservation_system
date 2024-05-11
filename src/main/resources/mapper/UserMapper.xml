@@ -24,4 +24,11 @@
         email,phone,default_address_id,
         created_at,updated_at
     </sql>
+
+    <select id="selectUserByEmployeeId" resultMap="BaseResultMap">
+        select user.*
+        from reservation_system.user
+        join reservation_system.employee on user.id = employee.user_id
+        where employee.id = #{employeeId}
+    </select>
 </mapper>

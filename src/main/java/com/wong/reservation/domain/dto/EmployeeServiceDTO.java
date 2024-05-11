@@ -23,6 +23,10 @@ public class EmployeeServiceDTO {
     private BigDecimal price;
     @Schema(title = "服务时间单位", name = "timeUnit", example = "hour", requiredMode = Schema.RequiredMode.REQUIRED)
     private String timeUnit;
-    @Schema(title = "服务详细介绍", name = "detailedPictures", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(title = "服务介绍", name = "description", example = "这是一个服务介绍", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String description;
+    @Schema(title = "服务详细介绍图片", name = "detailedPictures", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private List<MultipartFile> detailedPictures;
+    @Schema(title = "服务详细介绍图片(URL)", name = "detailedPicturesUrl", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private List<String> detailedPicturesUrl;
 }

@@ -367,7 +367,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 LambdaUpdateWrapper<Order> wrapper = new LambdaUpdateWrapper<>();
                 wrapper
                         .eq(Order::getId, evaluation.getOrderId())
-                        .set(Order::getStatus, OrderStatusConstant.EVALUATED);
+                        .set(Order::getStatus, OrderStatusConstant.EVALUATED)
+                        .set(Order::getEndTime, LocalDateTime.now());
                 update(wrapper);
                 transactionManager.commit(status);
             } catch (Exception e) {

@@ -1,5 +1,6 @@
 package com.wong.reservation.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.wong.reservation.domain.dto.Result;
 import com.wong.reservation.domain.entity.Employee;
 import com.wong.reservation.service.EmployeeService;
@@ -30,5 +31,30 @@ public class EmployeeController {
     @RequestMapping(value = "/bind", method = RequestMethod.POST)
     public Result<?> bindingEmployeeInfo(@RequestBody Employee employee) {
         return employeeService.bindingEmployeeInfo(employee);
+    }
+
+    /**
+     * 获取员工信息
+     *
+     * @return Result<Employee> 员工信息
+     */
+    @Operation(summary = "获取员工信息")
+    @RequestMapping(value = "/info", method = RequestMethod.GET)
+    public Result<Employee> getEmployeeInfo() {
+        return employeeService.getEmployeeInfo();
+    }
+
+    /**
+     * 成为员工
+     *
+     * @return Result<?> 操作结果
+     */
+    @Operation(summary = "成为员工")
+    @RequestMapping(value = "/become", method = RequestMethod.GET)
+    public Result<?> becomeEmployee() {
+        Employee employee = new Employee();
+        employee.setUserId(StpUtil.getLoginIdAsLong());
+        boolean isSaved = employeeService.save(employee);
+        return isSaved ? Result.success("成为员工成功") : Result.fail("成为员工失败");
     }
 }

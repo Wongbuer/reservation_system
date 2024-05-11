@@ -1,5 +1,6 @@
 package com.wong.reservation.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wong.reservation.constant.OrderStatusConstant;
 import com.wong.reservation.domain.dto.Result;
@@ -37,6 +38,13 @@ public class EvaluationServiceImpl extends ServiceImpl<EvaluationMapper, Evaluat
         }
         boolean isSaved = save(evaluation);
         return isSaved ? Result.success("评价成功") : Result.fail("评价失败");
+    }
+
+    @Override
+    public Result<Evaluation> getEvaluationByOrderId(Long orderId) {
+        LambdaQueryWrapper<Evaluation> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Evaluation::getOrderId, orderId);
+        return getOne(wrapper) == null ? Result.fail("评价不存在") : Result.success(getOne(wrapper));
     }
 }
 

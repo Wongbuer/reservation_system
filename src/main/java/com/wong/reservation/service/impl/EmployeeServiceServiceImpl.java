@@ -41,6 +41,7 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
         employeeService.setServiceId(employeeServiceDTO.getServiceId());
         employeeService.setPrice(employeeServiceDTO.getPrice());
         employeeService.setTimeUnit(employeeServiceDTO.getTimeUnit());
+        employeeService.setDescription(employeeServiceDTO.getDescription());
 
         // 查询有无重复数据
         LambdaQueryWrapper<EmployeeService> wrapper = new LambdaQueryWrapper<>();
@@ -50,9 +51,9 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
             return false;
         }
 
-        List<String> urlList = new ArrayList<>(employeeServiceDTO.getDetailedPictures().size());
         // 上传图片, 获取url
         if (!CollectionUtils.isEmpty(employeeServiceDTO.getDetailedPictures())) {
+            List<String> urlList = new ArrayList<>(employeeServiceDTO.getDetailedPictures().size());
             employeeServiceDTO.getDetailedPictures().forEach(pic -> {
                 FileInfo fileInfo = fileStorageService.of(pic).upload();
                 if (fileInfo != null) {
@@ -63,6 +64,10 @@ public class EmployeeServiceServiceImpl extends ServiceImpl<EmployeeServiceMappe
                 }
             });
             String pics = String.join(",", urlList);
+            employeeService.setDetailedPictures(pics);
+        }
+        if (!CollectionUtils.isEmpty(employeeServiceDTO.getDetailedPicturesUrl())) {
+            String pics = String.join(",", employeeServiceDTO.getDetailedPicturesUrl());
             employeeService.setDetailedPictures(pics);
         }
 

@@ -1,0 +1,41 @@
+@startuml
+participant "Client" as C
+participant "OrderService" as OS
+participant "OrderLock" as OL
+participant "Order" as O
+participant "ServiceService" as SS
+participant "AliPayService" as APS
+
+C -> OS: payOrder(id, response)
+activate OS
+OS -> OL: acquireLock(lockKey, 5000)
+activate OL
+OL --> OS: isLocked
+deactivate OL
+alt isLocked is true
+    OS -> OS: getById(id)
+    activate OS
+    OS --> OS: order
+    deactivate OS
+    alt order is not empty and status is ACCEPTED
+        OS -> SS: getById(order.getServiceId())
+        activate SS
+        SS --> OS: serviceName
+        deactivate SS
+        OS -> APS: goToPay(aliPayDTO, response)
+        activate APS
+        APS --> OS:
+        deactivate APS
+        OS -> C: Result.success("跳转至支付界面", response)
+    else order is empty or status is not ACCEPTED
+        OS -> C: Result.fail(40000, "订单状态错误", response)
+    end
+    OS -> OL: releaseLock(lockKey)
+    activate OL
+    OL --> OS:
+    deactivate OL
+else isLocked is false
+    OS -> C: Result.fail(50000, "订单支付失败", response)
+end
+deactivate OS
+@enduml

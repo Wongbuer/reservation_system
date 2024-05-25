@@ -1,0 +1,19 @@
+@startuml
+start
+:客户端调用 payOrder(id, response) 方法;
+if (是否获取到锁?) then (是)
+  :通过 id 获取订单;
+  if (订单有效且状态为 ACCEPTED?) then (是)
+    :通过 serviceId 获取服务名称;
+    :准备 AliPayDTO;
+    :调用 goToPay(aliPayDTO, response) 方法;
+    :返回成功结果;
+  else (否)
+    :由于订单无效或状态错误，返回失败结果;
+  endif
+  :释放锁;
+else (否)
+  :由于无法获取锁，返回失败结果;
+endif
+stop
+@enduml

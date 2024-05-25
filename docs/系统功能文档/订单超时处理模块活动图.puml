@@ -1,0 +1,56 @@
+@startuml
+title 订单超时处理流程
+
+start
+:接收消息;
+:获取Redis键;
+:判断订单类型;
+if (订单创建前缀) then (yes)
+  :设置类型为订单锁定接受前缀;
+  :获取订单ID;
+else (no)
+  if (订单接受前缀) then (yes)
+    :设置类型为订单锁定支付前缀;
+    :获取订单ID;
+  else (no)
+    if (订单评价前缀) then (yes)
+      :设置类型为订单锁定评价前缀;
+      :获取订单ID;
+    else (no)
+      :返回;
+      stop
+    endif
+  endif
+endif
+:获取订单;
+:获取锁;
+if (获取锁成功) then (yes)
+  :获取订单详情;
+  if (订单不存在) then (yes)
+    :抛出异常;
+  else (no)
+    :设置更新条件;
+    :设置查询条件;
+    if (订单状态为创建) then (yes)
+      :设置订单状态为超时创建;
+      :执行数据库操作;
+    else (no)
+      if (订单状态为接受) then (yes)
+        :设置订单状态为超时支付;
+        :执行数据库操作;
+      else (no)
+        if (订单状态为未评价) then (yes)
+          :设置订单状态为超时评价;
+          :执行数据库操作;
+        else (no)
+          :记录订单状态已变化;
+        endif
+      endif
+    endif
+  endif
+  :释放锁;
+else (no)
+  :记录锁竞争失败;
+endif
+stop
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+participant "doHandleMessage(Message message)" as A
+participant "订单服务" as B
+participant "时间表服务" as C
+participant "timeoutDatabaseOperation()" as D
+
+A -> A: 从redisKey中提取orderId和type
+A -> A: 使用lockKey获取锁
+alt 获取锁成功
+    A -> B: 通过orderId获取订单
+    alt 订单存在
+        A -> A: 创建LambdaUpdateWrapper和LambdaQueryWrapper
+        alt 订单状态为CREATED
+            A -> D: 调用timeoutDatabaseOperation()
+            D -> B: 更新订单状态为TIMEOUT_CREATED
+            D -> C: 移除时间表条目
+        else 订单状态为ACCEPTED
+            A -> D: 调用timeoutDatabaseOperation()
+            D -> B: 更新订单状态为TIMEOUT_PAYMENT
+            D -> C: 移除时间表条目
+        else 订单状态为NOT_EVALUATED
+            A -> D: 调用timeoutDatabaseOperation()
+            D -> B: 更新订单状态为TIMEOUT_EVALUATED
+            D -> C: 移除时间表条目
+        end
+    else 订单不存在
+        A -> A: 抛出RuntimeException("订单不存在")
+    end
+    A -> A: 释放锁
+else 获取锁失败
+    A -> A: 记录日志 "锁竞争失败——订单状态应该已经发生变化"
+end
+@enduml

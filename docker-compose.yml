@@ -25,6 +25,7 @@ services:
           - cache
 
   reservation:
+    image: wongbuer/reservation-system:latest
     build:
       dockerfile: Dockerfile
     ports:

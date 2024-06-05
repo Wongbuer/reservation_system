@@ -5,14 +5,14 @@ spring:
     name: reservation-system
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql:///reservation_system?serverTimezone=Asia/Shanghai
-    username: root
-    password: 010519
+    url: ENC(cytV8TXEQvN6+JUttKabc8CQkx5bhKPH64vcjRY9MI4vafeIvMeCoH1KmPAz0VpTvvjb1r2BKXZzMOip2bvwvbarfXzc9oah2BQqJxV0Vd8nSQiy0WXFwUT67OBzG27d)
+    username: ENC(O/2U0HPop+tnY6H+ltkOx7E73SLKMpDAfNmYh8Owl38s7WR8mTpg5ywqPoJoA0Tl)
+    password: ENC(fl7rDnf/yWOSQ9anSV83jG8aE69k4Rrkfcz8Uv1VhK1DRpKfnqVfLKnzRqeJGZQC)
   data:
     redis:
-      host: 127.0.0.1
+      host: ENC(n+RQ2DicJf3WzUxF0AKEL2fNCGFO/9yZNpmLqr2Uy+Xe94NpM9gWAHCTjTAvP80L)
       port: 6379
-      password: 010519
+      password: ENC(t6kp608ATGfOO+CIeizq+u8y5ztCZAQFnmnVJpO4ynSGxoIzYDrbUZoO19Ggr0lC)
       database: 0
   mvc:
     servlet:
@@ -38,28 +38,23 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 alipay:
   app-id: 9021000136632585
-  alipay-public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjEBWdQnf2k5y6A6KHaXVRI/6pBwb+MOtnSkRxzHN5MElBX/IHcw0PUMbSYHhw3yYmCGmmg7PCd+rGCxO+UsFxs0CtSu90rEHCAMaNATUoiJ6cps+S+cPb4tp/JKwGKYwnW50xcumdQspW3aX0HllKp477zGLPsi8siizUapzFBzkoZDhpCsDdqMT0YYLzTs0fIwrOfXjKMN7vk7tO5OXN9AE7DGBAs0QrqN/i6z5B/vxuzSz45pjT+28F47V4ekZMBicnwSvYMEpxrPn2TQo0KdkvYJaPXn/bT/J3iyZsA+yaCAXC4Bl/GmCMC9WqhA4rH/oKz15ilbqk215XzDkLwIDAQAB
-  app-private-key: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCMQFZ1Cd/aTnLoDoodpdVEj/qkHBv4w62dKRHHMc3kwSUFf8gdzDQ9QxtJgeHDfJiYIaaaDs8J36sYLE75SwXGzQK1K73SsQcIAxo0BNSiInpymz5L5w9vi2n8krAYpjCdbnTFy6Z1CylbdpfQeWUqnjvvMYs+yLyyKLNRqnMUHOShkOGkKwN2oxPRhgvNOzR8jCs59eMow3u+Tu07k5c30ATsMYECzRCuo3+LrPkH+/G7NLPjmmNP7bwXjtXh6RkwGJyfBK9gwSnGs+fZNCjQp2S9glo9ef9tP8neLJmwD7JoIBcLgGX8aYIwL1aqEDisf+grPXmKVuqTbXlfMOQvAgMBAAECggEADaa5g5zZcBtQreu0X9xjXNAS2mRuCJGrVW/I7jWXz9tI6jcc2GGm+AuPHWGKAwgepjgoSjiEyHY/5hNyAGvf/RC5Yb8HM/nNMGd05nlN5RYsCvm3X5X296l/QHlasJuEgd5deV8wLZZPiTqK3lzijvpl5QtSfWL2kvTJN3q6xss/rJYB/3vi1am9ECbfqZ7Hrl4j6uyMJkWvUpFzEPoClGRhV8BbChcFjg+V1ySfMify0dTVRWYDGJiiPUJoiaURly9WxJ2aidCTQ+V2XptDiAxvZ/D1WAQjDnIHj4Pjuk+5P43S8PPcp4c8Ge5L/D8ZpLxGMWt0BwAUS/qF3dPE0QKBgQDi8Saq44MIvju+T4tFAdMN7eJ0tIQ761ryo254jcFZEItnnswLZgyti7oUlmnvLMnUCsdevbzA7ijhRZeLXZnGQwRsPYiM1e7u4eOF/tIMSOjQJ8sQgr3QlfYljN3tm3WSjZw0MS4NdE/YHTGxrzCTaFkz64YBKJkPWxOOaMB+qQKBgQCeNZWnLoqXF2mXpi5QJT5xE2z7dwSc0BimT4noClyid2mgYx6iqY0StYwdmFamN9qhP+lqaI2hy6/z6CH/1GNroxQw3TxwlOPDrwxol6iykfByIwFHhfFQfPKi2dt8COfWR/ONgG9BpBOURqoX+b8aas0iD7u/E1w0Oti9erpLFwKBgCmpOX7/myt8uLz8H0YAyrzw4bSo+umBEEYgyIPrCgaOqfjQxwaEqmklkHh9EF9u6nI5tFXpIQCN+AU64FIeUb96yBISzcGE+IL0Bu+vUuIcdFjaJUYXqj7jeLd1/7vB4TiRNI7ERH8Fzi6PVXMYBSPacR296/DEgiy2fIWVJ1lZAoGBAJwT5PWvlo4ETOmMyjfK5lULgwJ5ohVJvmekJDrEriqhf5T49Coo9sG0VOyFc0Y75/YYZR/S0ZcCqS0InzIRx5tSoQKr34p5eFF+idFNfOHd08Xl/scevrhW68/4+OzepEjjZsT8JcYuJhqrs/Y/LmbTYlfuCZwxb08flt8nCk41AoGBAIkrulM/MSCkwup3xj8aOU5nrf7x1iKKHkWdOktoL2jaVY6TnxzryLjk6H5xxoxU2OIe9Af5C0Fke2O3wNz4T4ORqAuShwr/ivvnImZApgdAfCLDkWRFAzqgrW6fvIzbGEHcCFx/wuTcqmNuLxNa0YicZZeSugzJ0gG/AmHWQAkx
-redisson:
-  server-mode: single
-  address: redis://127.0.0.1:6379
-  password: 010519
-  database: 0
+  alipay-public-key: ENC(Ksl7USepTP8oUiI5uXpkhubj0lNa37ibEh3szbQMS1JfvFdUyt9rOvhtBW6wAxkwDR1RT967yukgooq5u9ZH2i+u12TmmEGjtdx2kA9yhhL3AUFJq7A51u9K8m7iDu3dLwqesmQe1+kkre8FmDC4Su7nOCeLf1g00KGKhCqfCK3i61nbiw5/x1G9AssRPOQP+OpQsCjo//MJ3hpzOxp4saRlnc/MLQ4mQY6GW1FIJWdPVHrTvrR0s7LF2uN7nlRa3xB7B12pZr6KhfQKk33bTFjxkuAxAttmPbHWA3gSDyFB4VTN0R2jB3W2HLIbHusKuqOpw0h8X6s+Z8KbG03LsyW/aC0/EPCQjpyykA8nMT4tRMtOSbkcfCFWacdaK6i2q19LTEyyOhDP1QYLegGVpha+ReJPrjCVpwsrNwzEC972OfbVwmuAru00joJrCQjqka2LcAMRcc52F+8rSzJcvLGXr6V+muI3yPV717/xgQ2ASJ6JLfFESDyTFEEe4mWCh9scv0MQabKRacvmqScXa+VxHXqcz5DpA7TVvIkloOVNJHxq9vKcm6Y9CMW/VvMe)
+  app-private-key: ENC(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)
 order:
   lock:
     lock-type: distributed
 dromara:
   x-file-storage:
-    default-platform: qiniu-kodo-1
+    default-platform: ENC(wDaGLm/pZi2khXG+MQ59e9wDixd5gaV65+e3igub8MP/eu8OyPAizP83uohXrOeP)
     thumbnail-suffix: ".jpg"
     qiniu-kodo:
-      - platform: qiniu-kodo-1 # 存储平台标识
+      - platform: ENC(+3blY6sbwlnCkkMxfVl58Raf5pAGAGsrmn5xvdTlZXBjAuHZEEva3DgVo4UH0yoI) # 存储平台标识
         enable-storage: true  # 启用存储
-        access-key: irQN7435V6SMIB-MqH24DJEFhwj-vwPsD74z05gh
-        secret-key: U4lzab5eLy34ZB5K3U-40SLtS3Eo7pU4c2axMG6N
-        bucket-name: wongbuer-reservation-system
-        domain: http://sck613b3h.hn-bkt.clouddn.com/
-        base-path: detailed_pic/ # 基础路径
+        access-key: ENC(K7sjNH66C0aLO5LQzNyMmxY14wFbWLblsXUpI3eHRr4A4VImFmsRpsmk3t2Oel45kSoFKZyIXAQxXCbcgSi55ZfcYOBxWQ7RKXF9EwuzhOU=)
+        secret-key: ENC(ErFkt5lpqzAlGE62QSLCHgEvFSEYS5bM3XOC9ki9qtlIiylng4TiXRUCmDu4y8qcMJVQT4SxyAW7MvICXqfoqoWbQsk/nNi83f+O45Wdbws=)
+        bucket-name: ENC(rpLwjEH+AZJEKPJuZJDNADN47EG5Z9TUKJGcutH3OAzSE9M9IdzuKNyRSZ60cMjRh7SjuYjFAw7CUKXy9tU8aQ==)
+        domain: ENC(U27fuh8JxJxxj5TziKzOIo7LrI7aDYOqxng3qiSCTa6pBBiR5rp5/+FXOyDAwDj9d3fVj9dy8DuzeHlzzvVrEJceGloAWCa17+m+4kZKLUk=)
+        base-path: ENC(yOTfJe1wgrOmkjxuIueExGTnoITms1T5C6mrAmI5PXCwid1AZ+ySr7qRLGWkBYdD) # 基础路径
 
 logging:
   level:

@@ -1,10 +1,10 @@
 spring:
   datasource:
-    url: jdbc:mysql://db:3306/reservation_system?serverTimezone=Asia/Shanghai
-    username: root
-    password: '010519'
+    url: ENC(0z6qhSMB0KXzQ65U4JhkXIw/MJvob3s7PFMesnmTSbV8VD68e/UMsV1klLY5q6vK0/oTMiCQdttcKvtE8Y2n5bQrPLLMVc8G63P6wFdIWOQBN2S840SrUnWdmN5tsz6Q0QugSPuu19OkADGYeCPpRQ==)
+    username: ENC(jyJIapttYh94U6QPwTk5rvGYR63frfUl01geVdp9cUJDc4KymiAmCJgXgDszO0r9)
+    password: ENC(+oShddnUxrpGLHVIgbUVpJZGdhl9O9BhaMIEtjBKAsbHAt4pE8EKO2L4tjLkXBTw)
   data:
     redis:
-      host: redis
+      host: ENC(FchoTLT1jiKziw6bEzmDdDr+10VUwoXMYkcScgs8T120L7APO3hlP17Bro5fbN9p)
       port: 6379
-      password: 010519
+      password: ENC(FvsibbRScbymhFkBukKRNZF5G3dR0t7G/aM9it2BBkN8NApMZyDNKV08W+ptM8I9)

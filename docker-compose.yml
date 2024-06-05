@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: '010519'
+    ports:
+      - "3306:3306"
+    volumes: # 挂载包含初始化脚本的目录
+      - ./docs/sql/reservation_system.sql:/docker-entrypoint-initdb.d/reservation_system.sql
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    restart: always
+    command: redis-server --requirepass 010519
+    ports:
+      - "6379:6379"
+    networks:
+      backend:
+        aliases:
+          - cache
+
+  reservation:
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

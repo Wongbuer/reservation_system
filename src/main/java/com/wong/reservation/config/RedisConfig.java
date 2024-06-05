@@ -1,11 +1,11 @@
 package com.wong.reservation.config;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.wong.reservation.domain.properties.RedissonProperties;
 import jakarta.annotation.Resource;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -27,8 +27,6 @@ import java.time.format.DateTimeFormatter;
  */
 @Configuration
 public class RedisConfig {
-    @Resource
-    private RedissonProperties redissonProperties;
 
     /**
      * 自定义redisTemplate
@@ -84,11 +82,16 @@ public class RedisConfig {
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
+        String url = SpringUtil.getProperty("spring.data.redis.host");
+        String port = SpringUtil.getProperty("spring.data.redis.port");
+        String database = SpringUtil.getProperty("spring.data.redis.database");
+        String password = SpringUtil.getProperty("spring.data.redis.password");
+        String address = "redis://" + url + ":" + port;
         config
                 .useSingleServer()
-                .setAddress(redissonProperties.getAddress())
-                .setPassword(redissonProperties.getPassword())
-                .setDatabase(redissonProperties.getDatabase());
+                .setAddress(address)
+                .setPassword(password)
+                .setDatabase(Integer.parseInt(database));
         return Redisson.create(config);
     }
 }

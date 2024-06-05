@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:mysql://db:3306/reservation_system?serverTimezone=Asia/Shanghai
+    username: root
+    password: '010519'
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: 010519

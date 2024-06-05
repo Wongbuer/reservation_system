@@ -13,6 +13,7 @@ spring:
       host: 127.0.0.1
       port: 6379
       password: 010519
+      database: 0
   mvc:
     servlet:
       load-on-startup: 1

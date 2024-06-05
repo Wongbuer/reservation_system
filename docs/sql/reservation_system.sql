@@ -13,7 +13,8 @@
 
  Date: 25/05/2024 18:54:55
 */
-
+CREATE DATABASE IF NOT EXISTS `reservation_system`;
+USE `reservation_system`;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 

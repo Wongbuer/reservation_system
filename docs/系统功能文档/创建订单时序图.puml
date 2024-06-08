@@ -1,0 +1,37 @@
+@startuml
+start
+:从登录信息获取userId;
+:根据雪花算法生成orderId;
+if (存在employeeServiceId) then (yes)
+:补全其他信息;
+endif
+:判断order是否含有必要参数;
+if (订单信息不完整) then (yes)
+:return 订单信息不完整;
+else (no)
+  if (订单服务有误 or 订单地址有误 or 订单预约时间有误) then (yes)
+  :return 订单信息有误;
+  else (no)
+    if (存在相同的订单) then (yes)
+    :return 订单重复, 请勿重复下单;
+    endif
+    :获取锁;
+    if (获取锁成功) then (yes)
+    :开启事务;
+    if (订单金额有误 or 员工时间冲突) then (yes)
+    :return 订单信息有误;
+    else (no)
+    :设置订单状态为created;
+    :添加订单;
+    :添加时间表;
+    :添加订单到redis, 15分钟后过期, 到期未接受则改变订单状态;
+    :提交事务;
+    :return 添加订单成功;
+    endif
+    else (no)
+    :return 订单创建失败, 请稍后再试;
+    endif
+  endif
+endif
+stop
+@enduml
